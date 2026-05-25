@@ -17,9 +17,13 @@ function HomeBanner({ netflixOriginals }: Props) {
 
   // console.log("🚀 ~ file: HomeBanner.tsx:16 ~ HomeBanner ~ movie:", movie);
 
-  useEffect(() => {
+ useEffect(() => {
+    if (!netflixOriginals?.length) return;
+
     setMovie(
-      netflixOriginals[Math.floor(Math.random() * netflixOriginals.length)]
+      netflixOriginals[
+        Math.floor(Math.random() * netflixOriginals.length)
+      ]
     );
   }, [netflixOriginals]);
 
