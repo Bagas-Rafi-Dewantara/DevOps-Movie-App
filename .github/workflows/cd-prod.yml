@@ -1,0 +1,53 @@
+name: CD - Production Deployment (Azure)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Memungkinkan trigger manual dari tab Actions di GitHub
+
+env:
+  AZURE_WEBAPP_NAME: 'movie-app-prod'
+  AZURE_RESOURCE_GROUP: 'movie-app-rg' 
+  ACR_REGISTRY: 'movieappregistry.azurecr.io'
+  ACR_IMAGE_TAG: 'latest'
+
+jobs:
+  build-and-deploy:
+    name: Build Docker & Deploy to Azure
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Ambil kode
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Login ke Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 3. Login ke Azure Container Registry (ACR)
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # 4. Build Docker Image
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} .
+
+      # 5. Push Docker Image ke ACR
+      - name: Push Docker Image to ACR
+        run: |
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
+
+      # 6. Deploy ke Azure App Service
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: '${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}'
