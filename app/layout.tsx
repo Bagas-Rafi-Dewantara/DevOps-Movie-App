@@ -1,4 +1,5 @@
 import SessionProvider from "@/components/SessionProvider";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { authOption } from "@/pages/api/auth/[...nextauth]";
 import { getServerSession } from "next-auth";
 import "../styles/globals.css";
@@ -19,8 +20,18 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* Prevent flash of unstyled content (FOUC) on theme load */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('theme')||'dark';if(t==='dark')document.documentElement.classList.add('dark');})()`,
+          }}
+        />
+      </head>
       <body>
-        <SessionProvider session={session}>{children}</SessionProvider>
+        <ThemeProvider>
+          <SessionProvider session={session}>{children}</SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

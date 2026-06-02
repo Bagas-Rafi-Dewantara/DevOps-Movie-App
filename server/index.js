@@ -8,13 +8,15 @@ import { findMovies } from "./controllers/findMovie.js";
 import { findPerson } from "./controllers/findPerson.js";
 import { getMovie } from "./controllers/getMovie.js";
 import { getPerson } from "./controllers/getPerson.js";
+import { getReviews } from "./controllers/getReviews.js";
 import { getUserData } from "./controllers/getUserData.js";
 import { saveMovies } from "./controllers/saveMovie.js";
 import { SavePerson } from "./controllers/savePerson.js";
+import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
 
-dotenv.config();
+dotenv.config({ path: ".env.local" });
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -56,6 +58,13 @@ mongoose.connection.once("open", () => {
       change: change,
     });
   });
+
+  const changeReview = mongoose.connection.collection("review-data").watch();
+  changeReview.on("change", (change) => {
+    pusher.trigger("review-data", "new-reviewData", {
+      change: change,
+    });
+  });
 });
 
 app.get("/", (req, res) => res.status(200).send("Movie App Build"));
@@ -69,5 +78,7 @@ app.get("/person/:id", getPerson);
 app.post("/save/person", SavePerson);
 app.post("/find/person", findPerson);
 app.get("/suggestion/:id", suggestionUser);
+app.get("/reviews/:movieId", getReviews);
+app.post("/save/review", saveReview);
 
 app.listen(port, () => console.log(`listen on localhost:${port}`));

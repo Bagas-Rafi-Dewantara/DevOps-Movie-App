@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { MovieReviewData } from "@/typings";
 import { baseURL } from "@/utils/baseUrl";
 import Avatar from "@mui/material/Avatar";
@@ -11,43 +12,61 @@ type Props = {
 };
 
 function MovieReview({ movieReview }: Props) {
+  const { theme } = useTheme();
+
+  const cardBg =
+    theme === "dark"
+      ? "bg-gray-900"
+      : "bg-white border border-gray-200 shadow-sm";
+  const textSecondary =
+    theme === "dark" ? "text-gray-400" : "text-gray-500";
+  const ratingBg =
+    theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-yellow-100 text-yellow-700";
+
+  if (movieReview.length < 1) return null;
+
   return (
-    <>
-      {movieReview.length > 1 && (
-        <div className="px-4 pb-20">
-          <Container header="Review">
-            <div className="w-full h-[300px] overflow-x-hidden overflow-y-scroll scrollbar-hide">
-              {movieReview.map((review) => (
-                <div
-                  key={review.id}
-                  className="h-auto w-full px-12 py-12 bg-gray-900 mb-6 mt-6 rounded-md shadow-md"
-                >
-                  <div className="flex gap-8">
-                    <Avatar
-                      alt={review.author_details.name || review.author}
-                      src={`${baseURL}${review.author_details.avatar_path}`}
-                      sx={{ width: 56, height: 56 }}
-                    />
-                    <div>
-                      <p className="text-xl font-semibold">
-                        A review by {review.author}
-                      </p>
-                      <p className="text-sm">
-                        Written by {review.author} on{" "}
-                        {moment(review.created_at).format("MMM Do YYYY")}
-                      </p>
-                      <div className="w-[80%] py-6">
-                        <p>{review.content}</p>
-                      </div>
-                    </div>
+    <div className="px-4 pb-10">
+      <Container header="Reviews from TMDB">
+        <div className="w-full max-h-[400px] overflow-x-hidden overflow-y-scroll scrollbar-hide space-y-4">
+          {movieReview.map((review) => (
+            <div
+              key={review.id}
+              className={`w-full px-8 py-6 ${cardBg} rounded-md`}
+            >
+              <div className="flex gap-5">
+                <Avatar
+                  alt={review.author_details.name || review.author}
+                  src={`${baseURL}${review.author_details.avatar_path}`}
+                  sx={{ width: 48, height: 48, flexShrink: 0 }}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-1">
+                    <p className="text-base font-semibold">
+                      A review by {review.author}
+                    </p>
+                    {review.author_details.rating && (
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded-full ${ratingBg}`}
+                      >
+                        ★ {review.author_details.rating}/10
+                      </span>
+                    )}
                   </div>
+                  <p className={`text-xs ${textSecondary}`}>
+                    Written by {review.author} on{" "}
+                    {moment(review.created_at).format("MMM Do YYYY")}
+                  </p>
+                  <p className={`mt-3 text-sm leading-relaxed ${textSecondary}`}>
+                    {review.content}
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
-          </Container>
+          ))}
         </div>
-      )}
-    </>
+      </Container>
+    </div>
   );
 }
 

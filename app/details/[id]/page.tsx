@@ -10,6 +10,7 @@ import Row from "@/components/Row";
 import Seasons from "@/components/Seasons";
 import ToastContainerBar from "@/components/ToastContainer";
 import Trailer from "@/components/Trailer";
+import UserReview from "@/components/UserReview";
 import { Details, MovieCastCrew } from "@/typings";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
@@ -153,6 +154,15 @@ function DetailsPage({}: Props) {
           <Seasons movieDetails={movieDetails.movieDetails as Details} />
         )}
         <MovieReview movieReview={movieDetails.review} />
+        <UserReview
+          movieId={(movieDetails.movieDetails as Details).id}
+          mediaType={isTV ? "tv" : "movie"}
+          movieTitle={
+            (movieDetails.movieDetails as Details).title ||
+            (movieDetails.movieDetails as Details).name
+          }
+          poster_path={(movieDetails.movieDetails as Details).poster_path}
+        />
         <Row
           movies={movieDetails.similar}
           title="YOU MAY ALSO LIKE"
