@@ -16,7 +16,7 @@ import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
 
-//FIX: Gunakan dotenv.config() tanpa path untuk production
+// FIX: Gunakan dotenv.config() tanpa path untuk production
 dotenv.config();
 
 const app = express();
@@ -33,7 +33,7 @@ const pusher = new Pusher({
 // middleware
 app.use(express.json());
 app.use(cors({
-  origin: '*', //Izinkan semua origin (untuk development)
+  origin: '*', // Izinkan semua origin (untuk development)
   credentials: true
 }));
 
@@ -69,17 +69,17 @@ mongoose.connection.once("open", () => {
   });
 });
 
-//HEALTH CHECK
+// HEALTH CHECK
 app.get("/", (req, res) => res.status(200).send("Movie App Build"));
 
-//USER ROUTES - support GET dan POST
+// USER ROUTES - support GET dan POST
 app.route("/user")
   .get(getUser)
   .post(getUser);
 
 app.get("/user/:id", getUserData);
 
-//MOVIE ROUTES
+// MOVIE ROUTES
 app.get("/movie/:id", getMovie);
 app.route("/save/movie")
   .get(saveMovies)
@@ -88,7 +88,7 @@ app.route("/find/movie")
   .get(findMovies)
   .post(findMovies);
 
-//PERSON ROUTES
+// PERSON ROUTES
 app.get("/person/:id", getPerson);
 app.route("/save/person")
   .get(SavePerson)
@@ -97,7 +97,7 @@ app.route("/find/person")
   .get(findPerson)
   .post(findPerson);
 
-//OTHER ROUTES
+// OTHER ROUTES
 app.get("/suggestion/:id", suggestionUser);
 app.get("/reviews/:movieId", getReviews);
 app.route("/save/review")
