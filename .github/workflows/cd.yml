@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: 'pso-fp-movieapp'
+  AZURE_WEBAPP_NAME: 'pso-fp-movieapp12'
   ACR_REGISTRY: 'movieappacr.azurecr.io'
   ACR_IMAGE_TAG: 'latest'
 
