@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: 'movie-app-prod'
-  ACR_REGISTRY: 'movieappregistry.azurecr.io'
+  AZURE_WEBAPP_NAME: 'pso-fp-movieapp'
+  ACR_REGISTRY: 'movieappacr.azurecr.io'
   ACR_IMAGE_TAG: 'latest'
 
 jobs:
