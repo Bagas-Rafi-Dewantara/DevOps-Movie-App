@@ -28,7 +28,9 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} .
+          docker build \
+            --build-arg NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }} \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} .
 
       - name: Push Docker Image to ACR
         run: |
