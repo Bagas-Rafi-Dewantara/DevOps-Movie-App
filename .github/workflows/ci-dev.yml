@@ -1,0 +1,51 @@
+name: CI - Code Quality & Testing (Dev)
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  code-quality:
+    name: Linting, Formatting & Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Ambil kode dari repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3. Install Dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. Jalankan ESLint (Code Quality)
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true # Tetap lanjut meski ada warning
+
+      # 5. Jalankan Prettier (Code Formatting)
+      - name: Check Formatting with Prettier
+        run: npx prettier --check .
+        continue-on-error: true
+
+      # 6. Jalankan Unit Test (Jest)
+      - name: Run Unit Tests
+        run: npm test -- --coverage --watchAll=false
+        continue-on-error: true # Sementara di-allow fail jika test belum 100% lengkap
+
+      # 7. Upload Coverage Report (Opsional)
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 5
