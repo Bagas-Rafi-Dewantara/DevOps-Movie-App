@@ -16,7 +16,7 @@ import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
 
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: "../.env.local" });
 const app = express();
 const port = process.env.PORT || 3001;
 
