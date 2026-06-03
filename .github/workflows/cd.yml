@@ -1,0 +1,52 @@
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch: 
+
+env:
+  AZURE_WEBAPP_NAME: 'pso-fp-movieapp'      
+  AZURE_RESOURCE_GROUP: 'PSO-12-MovieApp'     
+  ACR_REGISTRY: 'movieappacr.azurecr.io' 
+  ACR_IMAGE_TAG: 'latest'
+
+jobs:
+  build-and-deploy:
+    name: Build Docker & Deploy to Azure
+    runs-on: ubuntu-latest
+
+    steps:
+      # Ambil kode
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Login ke Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Login ke Azure Container Registry (ACR)
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      # Build Docker Image
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} .
+
+      # Push Docker Image ke ACR
+      - name: Push Docker Image to ACR
+        run: |
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
+
+      # Deploy ke Azure App Service
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: '${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}'
