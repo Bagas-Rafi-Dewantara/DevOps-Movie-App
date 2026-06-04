@@ -2,6 +2,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { authOption } from "@/pages/api/auth/[...nextauth]";
 import { getServerSession } from "next-auth";
+import Script from "next/script";
 import "../styles/globals.css";
 
 export const metadata = {
@@ -20,15 +21,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>
-        {/* Prevent flash of unstyled content (FOUC) on theme load */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('theme')||'dark';if(t==='dark')document.documentElement.classList.add('dark');})()`,
-          }}
-        />
-      </head>
       <body>
+        <Script id="theme-script" strategy="beforeInteractive">
+          {`(function(){var t=localStorage.getItem('theme')||'dark';if(t==='dark')document.documentElement.classList.add('dark');})()`}
+        </Script>
         <ThemeProvider>
           <SessionProvider session={session}>{children}</SessionProvider>
         </ThemeProvider>
