@@ -31,7 +31,10 @@ const pusher = new Pusher({
 // middleware
 app.use(express.json());
 app.use(cors({
-  origin: '*', // Izinkan semua origin (untuk development)
+  origin: [
+    'https://pso-fp-movieapp12-ecbzfqf9d9bmf2dq.southeastasia-01.azurewebsites.net',
+    'https://dev-ops-movie-app.vercel.app'
+  ], 
   credentials: true
 }));
 
