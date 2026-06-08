@@ -110,7 +110,7 @@ jobs:
           MAX_RETRIES=8
           RETRY_COUNT=0
           SUCCESS=false
-          
+
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net)
             echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
@@ -127,7 +127,7 @@ jobs:
               sleep 20
             fi
           done
-          
+
           if [ "$SUCCESS" = false ]; then
             echo "⚠️ Backend health check failed after $MAX_RETRIES attempts"
             echo "💡 Azure deployment might still be propagating. Check manually at:"
