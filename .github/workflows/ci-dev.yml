@@ -90,6 +90,9 @@ jobs:
 
       - name: Build Next.js Application
         run: npm run build
+      
+      - name: Build Docker Image
+        run: docker build -t movie-app:${{ github.sha }} .
 
       - name: CI Summary
         if: always()
