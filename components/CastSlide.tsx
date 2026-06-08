@@ -24,7 +24,7 @@ function CastSlide({ casts }: Props) {
       router.push(`/cast/${castID}`);
     } else {
       toast.error(
-        "You Need to Sign In to Look Up More Information About This Person"
+        "You Need to Sign In to Look Up More Information About This Person",
       );
     }
   };
@@ -52,7 +52,7 @@ function CastSlide({ casts }: Props) {
                 paddingTop: "120%",
                 color: "text.primary",
                 ...uiConfigs.style.backgroundImage(
-                  tmdbConfigs.posterPath(cast.profile_path)
+                  tmdbConfigs.posterPath(cast.profile_path),
                 ),
                 cursor: "pointer",
               }}

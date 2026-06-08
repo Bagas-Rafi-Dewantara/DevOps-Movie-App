@@ -27,7 +27,7 @@ function SubMovieLine({ movie }: Props) {
       }
     } else {
       toast.error(
-        "You Need to Sign In to Look Up More Information About This Movie"
+        "You Need to Sign In to Look Up More Information About This Movie",
       );
     }
   };

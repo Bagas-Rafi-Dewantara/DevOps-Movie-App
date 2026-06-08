@@ -30,17 +30,17 @@ const pusher = new Pusher({
 
 // middleware
 app.use(express.json());
-app.use(cors({
-  origin: '*', // Izinkan semua origin (untuk development)
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "*", // Izinkan semua origin (untuk development)
+    credentials: true,
+  }),
+);
 
 // Db config
 const connection_Url = process.env.MONGODB_URL;
 
-mongoose
-  .connect(connection_Url)
-  .catch((err) => console.log(err));
+mongoose.connect(connection_Url).catch((err) => console.log(err));
 
 mongoose.connection.once("open", () => {
   console.log("Db CONNECTED");
@@ -71,35 +71,25 @@ mongoose.connection.once("open", () => {
 app.get("/", (req, res) => res.status(200).send("Movie App Build"));
 
 // USER ROUTES - support GET dan POST
-app.route("/user")
-  .get(getUser)
-  .post(getUser);
+app.route("/user").get(getUser).post(getUser);
 
 app.get("/user/:id", getUserData);
 
 // MOVIE ROUTES
 app.get("/movie/:id", getMovie);
-app.route("/save/movie")
-  .get(saveMovies)
-  .post(saveMovies);
-app.route("/find/movie")
-  .get(findMovies)
-  .post(findMovies);
+app.route("/save/movie").get(saveMovies).post(saveMovies);
+app.route("/find/movie").get(findMovies).post(findMovies);
 
 // PERSON ROUTES
 app.get("/person/:id", getPerson);
-app.route("/save/person")
-  .get(SavePerson)
-  .post(SavePerson);
-app.route("/find/person")
-  .get(findPerson)
-  .post(findPerson);
+app.route("/save/person").get(SavePerson).post(SavePerson);
+app.route("/find/person").get(findPerson).post(findPerson);
 
 // OTHER ROUTES
 app.get("/suggestion/:id", suggestionUser);
 app.get("/reviews/:movieId", getReviews);
-app.route("/save/review")
-  .get(saveReview)
-  .post(saveReview);
+app.route("/save/review").get(saveReview).post(saveReview);
 
-app.listen(port, '0.0.0.0', () => console.log(`Server running on port ${port}`));
+app.listen(port, "0.0.0.0", () =>
+  console.log(`Server running on port ${port}`),
+);

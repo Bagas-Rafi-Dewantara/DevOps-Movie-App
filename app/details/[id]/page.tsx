@@ -59,7 +59,7 @@ function DetailsPage({}: Props) {
             isInclude ? "movie" : "tv"
           }/${movieID}/videos?api_key=${
             process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`
+          }&language=en-US`,
         ).then((res) => res.json()),
 
         fetch(
@@ -67,7 +67,7 @@ function DetailsPage({}: Props) {
             isInclude ? "movie" : "tv"
           }/${movieID}/credits?api_key=${
             process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`
+          }&language=en-US`,
         ).then((res) => res.json()),
 
         fetch(
@@ -75,7 +75,7 @@ function DetailsPage({}: Props) {
             isInclude ? "movie" : "tv"
           }/${movieID}?api_key=${
             process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`
+          }&language=en-US`,
         ).then((res) => res.json()),
 
         fetch(
@@ -83,13 +83,13 @@ function DetailsPage({}: Props) {
             isInclude ? "movie" : "tv"
           }/${movieID}/recommendations?api_key=${
             process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US&page=1`
+          }&language=en-US&page=1`,
         ).then((res) => res.json()),
 
         fetch(
           `https://api.themoviedb.org/3/${
             isInclude ? "movie" : "tv"
-          }/${movieID}/images?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          }/${movieID}/images?api_key=${process.env.NEXT_PUBLIC_API_KEY}`,
         ).then((res) => res.json()),
 
         fetch(
@@ -97,7 +97,7 @@ function DetailsPage({}: Props) {
             isInclude ? "movie" : "tv"
           }/${movieID}/reviews?api_key=${
             process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US&page=1`
+          }&language=en-US&page=1`,
         ).then((res) => res.json()),
       ]);
 

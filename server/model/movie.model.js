@@ -13,7 +13,7 @@ const MovieData = new mongoose.Schema(
     vote_average: Number,
     time: { type: Date, default: Date.now },
   },
-  { collection: "movie-data" }
+  { collection: "movie-data" },
 );
 
 export default mongoose.model("MovieData", MovieData);

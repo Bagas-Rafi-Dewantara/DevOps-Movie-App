@@ -25,7 +25,7 @@ function SeasonPage({}: Props) {
       setLoading(true);
 
       const seasonsData = await fetch(
-        `https://api.themoviedb.org/3/tv/${seasonId}/season/${seasonNumber}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`
+        `https://api.themoviedb.org/3/tv/${seasonId}/season/${seasonNumber}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`,
       ).then((res) => res.json());
 
       setSeasons(seasonsData.episodes);

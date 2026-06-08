@@ -18,10 +18,11 @@ function MovieReview({ movieReview }: Props) {
     theme === "dark"
       ? "bg-gray-900"
       : "bg-white border border-gray-200 shadow-sm";
-  const textSecondary =
-    theme === "dark" ? "text-gray-400" : "text-gray-500";
+  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
   const ratingBg =
-    theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-yellow-100 text-yellow-700";
+    theme === "dark"
+      ? "bg-gray-700 text-yellow-400"
+      : "bg-yellow-100 text-yellow-700";
 
   if (movieReview.length < 1) return null;
 
@@ -57,7 +58,9 @@ function MovieReview({ movieReview }: Props) {
                     Written by {review.author} on{" "}
                     {moment(review.created_at).format("MMM Do YYYY")}
                   </p>
-                  <p className={`mt-3 text-sm leading-relaxed ${textSecondary}`}>
+                  <p
+                    className={`mt-3 text-sm leading-relaxed ${textSecondary}`}
+                  >
                     {review.content}
                   </p>
                 </div>

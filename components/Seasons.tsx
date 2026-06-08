@@ -20,7 +20,7 @@ function Seasons({ movieDetails }: Props) {
       router.push(`/season/${sessionId}?sessionNumber=${sessionNumber}`);
     } else {
       toast.error(
-        "You Need to Sign In to Look Up More Information About This Session"
+        "You Need to Sign In to Look Up More Information About This Session",
       );
     }
   };

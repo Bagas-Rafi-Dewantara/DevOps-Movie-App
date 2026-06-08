@@ -51,7 +51,7 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
             userId: user.user.uid,
             movieId: movieId,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -92,7 +92,7 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
             original_name: movieDetails.original_name,
             vote_average: movieDetails.vote_average,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -114,7 +114,7 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
     } catch (error: any) {
       console.log(
         "🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:",
-        error
+        error,
       );
     }
   };
@@ -176,8 +176,8 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
                   paddingTop: "140%",
                   ...uiConfigs.style.backgroundImage(
                     tmdbConfigs.posterPath(
-                      movieDetails.poster_path || movieDetails.backdrop_path
-                    )
+                      movieDetails.poster_path || movieDetails.backdrop_path,
+                    ),
                   ),
                 }}
               />

@@ -1,8 +1,17 @@
 import Review from "../model/review.model.js";
 
 export const saveReview = async (req, res) => {
-  const { userId, movieId, mediaType, rating, content, userName, userPhoto, movieTitle, poster_path } =
-    req.body;
+  const {
+    userId,
+    movieId,
+    mediaType,
+    rating,
+    content,
+    userName,
+    userPhoto,
+    movieTitle,
+    poster_path,
+  } = req.body;
 
   if (!userId || !movieId || rating === undefined || !content) {
     return res.status(400).json({ error: "Missing required fields" });

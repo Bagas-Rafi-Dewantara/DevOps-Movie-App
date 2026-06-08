@@ -8,8 +8,6 @@
 Full Stack Movie Application with NEXT.JS 13!(Next.js 13, mongodb, node js, NextAuth.js v4, Tailwind CSS, framer-motion, TMDB Api, Google Authentication, primary information about a movies, Users can Add Bookmark in favorite actors and movies)
   </p>
 
-
-
 <!-- Badges -->
 
 <a href="https://movie-sapp.netlify.app" target="_blank">![](https://img.shields.io/website-up-down-green-red/http/monip.org.svg)</a>

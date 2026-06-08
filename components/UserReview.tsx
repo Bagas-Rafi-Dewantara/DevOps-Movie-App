@@ -52,7 +52,7 @@ function UserReview({
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/${movieId}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/${movieId}`,
       );
       const data: UserReviewData[] = await res.json();
       setReviews(data);
@@ -106,14 +106,14 @@ function UserReview({
             movieTitle,
             poster_path,
           }),
-        }
+        },
       );
 
       const data = await res.json();
 
       if (data.status === "created" || data.status === "updated") {
         toast.success(
-          data.status === "created" ? "Review submitted!" : "Review updated!"
+          data.status === "created" ? "Review submitted!" : "Review updated!",
         );
         setShowForm(false);
         await fetchReviews();
@@ -152,7 +152,9 @@ function UserReview({
 
   const avgRating =
     reviews.length > 0
-      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      ? (
+          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        ).toFixed(1)
       : null;
 
   return (
@@ -160,7 +162,9 @@ function UserReview({
       <Container header="User Reviews">
         {/* Summary bar */}
         {reviews.length > 0 && (
-          <div className={`flex items-center gap-4 p-4 rounded-lg border ${avgBg} mb-4`}>
+          <div
+            className={`flex items-center gap-4 p-4 rounded-lg border ${avgBg} mb-4`}
+          >
             <div className="text-center">
               <p className="text-3xl font-bold text-yellow-400">{avgRating}</p>
               <p className={`text-xs ${textSecondary}`}>Average</p>
@@ -179,7 +183,8 @@ function UserReview({
                 ))}
               </div>
               <p className={`text-xs mt-0.5 ${textSecondary}`}>
-                Based on {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+                Based on {reviews.length} review
+                {reviews.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
@@ -195,8 +200,8 @@ function UserReview({
               {showForm
                 ? "Cancel"
                 : userExistingReview
-                ? "Edit Your Review"
-                : "Write a Review"}
+                  ? "Edit Your Review"
+                  : "Write a Review"}
             </button>
           </div>
         )}
@@ -231,7 +236,9 @@ function UserReview({
                   </button>
                 ))}
                 {(hoverRating || rating) > 0 && (
-                  <span className={`ml-2 text-sm font-semibold ${textSecondary}`}>
+                  <span
+                    className={`ml-2 text-sm font-semibold ${textSecondary}`}
+                  >
                     {hoverRating || rating}/10
                   </span>
                 )}
@@ -261,8 +268,8 @@ function UserReview({
                 {isSubmitting
                   ? "Submitting…"
                   : userExistingReview
-                  ? "Update Review"
-                  : "Submit Review"}
+                    ? "Update Review"
+                    : "Submit Review"}
               </button>
               <button
                 onClick={() => setShowForm(false)}
@@ -321,7 +328,9 @@ function UserReview({
                           )}
                         </span>
                       ))}
-                      <span className={`text-xs ml-1 font-medium ${textSecondary}`}>
+                      <span
+                        className={`text-xs ml-1 font-medium ${textSecondary}`}
+                      >
                         {review.rating}/10
                       </span>
                     </div>

@@ -21,9 +21,7 @@ function HomeBanner({ netflixOriginals }: Props) {
     if (!netflixOriginals?.length) return;
 
     setMovie(
-      netflixOriginals[
-        Math.floor(Math.random() * netflixOriginals.length)
-      ]
+      netflixOriginals[Math.floor(Math.random() * netflixOriginals.length)],
     );
   }, [netflixOriginals]);
 

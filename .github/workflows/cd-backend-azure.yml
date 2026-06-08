@@ -4,13 +4,13 @@ on:
   push:
     branches: [master]
     paths:
-      - 'server/**'  # trigger jika ada perubahan DI DALAM folder server
+      - "server/**" # trigger jika ada perubahan DI DALAM folder server
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: 'movie-app-backend-pso'  
-  BACKEND_ACR_REGISTRY: 'movieapp.azurecr.io'  
-  ACR_IMAGE_TAG: 'latest'
+  AZURE_WEBAPP_NAME: "movie-app-backend-pso"
+  BACKEND_ACR_REGISTRY: "movieapp.azurecr.io"
+  ACR_IMAGE_TAG: "latest"
 
 jobs:
   build-and-deploy:
@@ -42,5 +42,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: '${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}'
+          images: "${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}"
           publish-profile: ${{ secrets.BACKEND_AZURE_WEBAPP_PUBLISH_PROFILE }}
