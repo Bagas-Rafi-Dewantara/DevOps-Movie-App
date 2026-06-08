@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 function SignModal({}: Props) {
-  return (
-    <div>SignModal</div>
-  )
+  return <div>SignModal</div>;
 }
 
-export default SignModal
+export default SignModal;

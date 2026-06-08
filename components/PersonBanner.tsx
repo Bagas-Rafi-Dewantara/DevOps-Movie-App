@@ -46,7 +46,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
             userId: user.user.uid,
             personId: personId,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -83,7 +83,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
             profile_path: personData.profile_path,
             known_for_department: "Action",
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -105,7 +105,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
     } catch (error: any) {
       console.log(
         "🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:",
-        error
+        error,
       );
     }
   };
@@ -170,7 +170,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
                 sx={{
                   paddingTop: "140%",
                   ...uiConfigs.style.backgroundImage(
-                    tmdbConfigs.posterPath(personData.profile_path)
+                    tmdbConfigs.posterPath(personData.profile_path),
                   ),
                 }}
               />

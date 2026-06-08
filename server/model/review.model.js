@@ -13,7 +13,7 @@ const ReviewSchema = new mongoose.Schema(
     poster_path: { type: String },
     time: { type: Date, default: Date.now },
   },
-  { collection: "review-data" }
+  { collection: "review-data" },
 );
 
 // One review per user per movie

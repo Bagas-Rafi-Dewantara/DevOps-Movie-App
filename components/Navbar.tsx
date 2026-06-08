@@ -38,8 +38,8 @@ function Navbar({}: Props) {
       ? "bg-[#141414]"
       : "bg-white shadow-md"
     : theme === "dark"
-    ? "hover:bg-[#141414]"
-    : "hover:bg-white/90";
+      ? "hover:bg-[#141414]"
+      : "hover:bg-white/90";
 
   const textColor = theme === "dark" ? "text-white" : "text-gray-900";
 
@@ -58,7 +58,8 @@ function Navbar({}: Props) {
         <ul className="hidden md:space-x-4 md:flex cursor-pointer items-center">
           <li
             className={`${navItemClass} ${
-              pathname === "/" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/" &&
+              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/")}
           >
@@ -66,7 +67,8 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/tv" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/tv" &&
+              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/tv")}
           >
@@ -77,7 +79,8 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/people" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/people" &&
+              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/people")}
           >
@@ -85,7 +88,8 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/search" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/search" &&
+              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/search")}
           >
@@ -94,7 +98,8 @@ function Navbar({}: Props) {
           {session && (
             <li
               className={`${navItemClass} ${
-                pathname === "/profile" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+                pathname === "/profile" &&
+                "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
               }`}
               onClick={() => router.push("/profile")}
             >
@@ -138,8 +143,12 @@ function Navbar({}: Props) {
               onClose={handleClose}
               MenuListProps={{ "aria-labelledby": "basic-button" }}
             >
-              <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
-              <MenuItem onClick={() => router.push("/profile")}>My account</MenuItem>
+              <MenuItem onClick={() => router.push("/profile")}>
+                Profile
+              </MenuItem>
+              <MenuItem onClick={() => router.push("/profile")}>
+                My account
+              </MenuItem>
               <MenuItem onClick={() => signOut()}>Logout</MenuItem>
             </Menu>
           </div>

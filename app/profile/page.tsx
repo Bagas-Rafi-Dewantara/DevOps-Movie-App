@@ -27,13 +27,13 @@ function ProfilePage({}: Props) {
 
       const [favoriteMovie, favoritePerson, userDetails] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/movie/${userId}`).then(
-          (res) => res.json()
+          (res) => res.json(),
         ),
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/person/${userId}`).then(
-          (res) => res.json()
+          (res) => res.json(),
         ),
         fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/user/${userId}`).then(
-          (res) => res.json()
+          (res) => res.json(),
         ),
       ]);
 
@@ -48,7 +48,7 @@ function ProfilePage({}: Props) {
     } catch (error: any) {
       console.log(
         "🚀 ~ file: DividerMovieLine.tsx:18 ~ fetchData ~ error:",
-        error.message
+        error.message,
       );
     }
   };

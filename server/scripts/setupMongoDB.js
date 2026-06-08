@@ -92,7 +92,9 @@ async function setup() {
   console.log("✅  Connected!\n");
 
   const db = client.db();
-  const existingCols = (await db.listCollections().toArray()).map((c) => c.name);
+  const existingCols = (await db.listCollections().toArray()).map(
+    (c) => c.name,
+  );
 
   for (const col of COLLECTIONS) {
     // Create collection if it doesn't exist
@@ -108,7 +110,7 @@ async function setup() {
     for (const { key, options } of col.indexes) {
       await collection.createIndex(key, options);
       console.log(
-        `   ↳ index "${options.name}"${options.unique ? " (unique)" : ""}`
+        `   ↳ index "${options.name}"${options.unique ? " (unique)" : ""}`,
       );
     }
   }

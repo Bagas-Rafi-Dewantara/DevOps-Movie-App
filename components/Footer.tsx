@@ -26,7 +26,7 @@ function Footer({}: Props) {
             userPhotoUrl: user.user.image,
             country: country,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -46,7 +46,7 @@ function Footer({}: Props) {
 
   useEffect(() => {
     fetch(
-      `https://extreme-ip-lookup.com/json/?key=${process.env.NEXT_PUBLIC_LOOKUP_KEY}`
+      `https://extreme-ip-lookup.com/json/?key=${process.env.NEXT_PUBLIC_LOOKUP_KEY}`,
     )
       .then((res) => res.json())
       .then((data) => setCountry(data.country));

@@ -21,7 +21,7 @@ function PersonMapping({ person }: Props) {
       router.push(`/cast/${person.id}`);
     } else {
       toast.error(
-        "You Need to Sign In to Look Up More Information About This Person"
+        "You Need to Sign In to Look Up More Information About This Person",
       );
     }
   };

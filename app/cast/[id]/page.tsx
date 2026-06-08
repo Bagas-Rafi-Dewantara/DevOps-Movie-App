@@ -30,15 +30,15 @@ function CastPage({}: Props) {
 
       const [personData, relatedMovies, taggedImages] = await Promise.all([
         fetch(
-          `https://api.themoviedb.org/3/person/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`
+          `https://api.themoviedb.org/3/person/${id}?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`,
         ).then((res) => res.json()),
 
         fetch(
-          `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`
+          `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`,
         ).then((res) => res.json()),
 
         fetch(
-          `https://api.themoviedb.org/3/person/${id}/tagged_images?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US&page=1`
+          `https://api.themoviedb.org/3/person/${id}/tagged_images?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US&page=1`,
         ).then((res) => res.json()),
       ]);
 

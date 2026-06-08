@@ -150,7 +150,7 @@ function SearchComponent({}: Props) {
       toast.error(
         option === "person"
           ? "You Need to Sign In to Look Up More Information About This Person"
-          : "You Need to Sign In to Look Up More Information About This Movie"
+          : "You Need to Sign In to Look Up More Information About This Movie",
       );
     }
   };
@@ -161,7 +161,8 @@ function SearchComponent({}: Props) {
     setSortBy("popularity.desc");
   };
 
-  const hasActiveFilters = selectedGenre || selectedYear || sortBy !== "popularity.desc";
+  const hasActiveFilters =
+    selectedGenre || selectedYear || sortBy !== "popularity.desc";
 
   useEffect(() => {
     fetchSearchData();
@@ -175,30 +176,43 @@ function SearchComponent({}: Props) {
   }, [option]);
 
   // Theme-aware classes
-  const cardBg = theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
-  const inputBg = theme === "dark" ? "bg-gray-800 border-gray-600 text-white" : "bg-white border-gray-200 text-gray-900";
-  const selectBg = theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900";
+  const cardBg =
+    theme === "dark"
+      ? "bg-gray-800 border-gray-700"
+      : "bg-white border-gray-200";
+  const inputBg =
+    theme === "dark"
+      ? "bg-gray-800 border-gray-600 text-white"
+      : "bg-white border-gray-200 text-gray-900";
+  const selectBg =
+    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900";
   const labelText = theme === "dark" ? "text-gray-300" : "text-gray-600";
 
   return (
     <div className="px-4 sm:px-8 lg:px-16 xl:px-20 mx-auto">
       {/* Header */}
       <div className="hero-headline flex flex-col items-center justify-center pt-24 text-center">
-        <h1 className={`font-bold text-3xl ${theme === "dark" ? "text-gray-300" : "text-gray-800"}`}>
+        <h1
+          className={`font-bold text-3xl ${theme === "dark" ? "text-gray-300" : "text-gray-800"}`}
+        >
           Search & Discover
         </h1>
-        <p className={`font-base text-base mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+        <p
+          className={`font-base text-base mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+        >
           {searchTerms
             ? `Showing results for "${searchTerms}"`
             : hasActiveFilters
-            ? "Browsing with filters"
-            : "Search by title or browse with filters"}
+              ? "Browsing with filters"
+              : "Search by title or browse with filters"}
         </p>
       </div>
 
       {/* Search bar */}
       <div className="pt-6">
-        <div className={`rounded-lg flex items-center w-full p-3 shadow-sm border ${inputBg}`}>
+        <div
+          className={`rounded-lg flex items-center w-full p-3 shadow-sm border ${inputBg}`}
+        >
           <button className="outline-none focus:outline-none flex-shrink-0">
             <svg
               className="w-5 h-5 text-gray-500"
@@ -216,7 +230,9 @@ function SearchComponent({}: Props) {
             type="search"
             placeholder={`Search ${option === "person" ? "people" : option === "tv" ? "TV shows" : "movies"}...`}
             className={`w-full pl-3 text-sm outline-none focus:outline-none bg-transparent ${
-              theme === "dark" ? "text-white placeholder-gray-500" : "text-gray-900 placeholder-gray-400"
+              theme === "dark"
+                ? "text-white placeholder-gray-500"
+                : "text-gray-900 placeholder-gray-400"
             }`}
             value={searchTerms}
             onChange={(e) => setSearchTerms(e.target.value)}
@@ -245,8 +261,8 @@ function SearchComponent({}: Props) {
                 showFilters || hasActiveFilters
                   ? "bg-red-600 text-white"
                   : theme === "dark"
-                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <MdFilterList className="text-base" />
@@ -273,7 +289,9 @@ function SearchComponent({}: Props) {
           >
             <div className={`mt-3 rounded-lg p-4 border ${cardBg}`}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}>
+                <h3
+                  className={`text-sm font-semibold ${theme === "dark" ? "text-gray-200" : "text-gray-700"}`}
+                >
                   Filters
                 </h3>
                 {hasActiveFilters && (
@@ -289,7 +307,11 @@ function SearchComponent({}: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Genre */}
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Genre</label>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${labelText}`}
+                  >
+                    Genre
+                  </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
@@ -310,7 +332,11 @@ function SearchComponent({}: Props) {
 
                 {/* Year */}
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Year</label>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${labelText}`}
+                  >
+                    Year
+                  </label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
@@ -331,7 +357,11 @@ function SearchComponent({}: Props) {
 
                 {/* Sort by */}
                 <div>
-                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Sort By</label>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${labelText}`}
+                  >
+                    Sort By
+                  </label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -360,19 +390,25 @@ function SearchComponent({}: Props) {
           {selectedGenre && (
             <span className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full">
               {genres.find((g) => String(g.id) === selectedGenre)?.name}
-              <button onClick={() => setSelectedGenre("")}><MdClose /></button>
+              <button onClick={() => setSelectedGenre("")}>
+                <MdClose />
+              </button>
             </span>
           )}
           {selectedYear && (
             <span className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full">
               {selectedYear}
-              <button onClick={() => setSelectedYear("")}><MdClose /></button>
+              <button onClick={() => setSelectedYear("")}>
+                <MdClose />
+              </button>
             </span>
           )}
           {sortBy !== "popularity.desc" && (
             <span className="flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full">
               {SORT_OPTIONS.find((s) => s.value === sortBy)?.label}
-              <button onClick={() => setSortBy("popularity.desc")}><MdClose /></button>
+              <button onClick={() => setSortBy("popularity.desc")}>
+                <MdClose />
+              </button>
             </span>
           )}
         </div>
@@ -382,7 +418,9 @@ function SearchComponent({}: Props) {
       {userSearchData.length < 1 ? (
         <div className="h-[300px] flex flex-col justify-center items-center gap-4">
           <FcSearch className="text-9xl animate-bounce" />
-          <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+          <p
+            className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
+          >
             {option === "person"
               ? "Type a name to search people"
               : "Search or use filters to discover content"}
@@ -420,7 +458,10 @@ function SearchComponent({}: Props) {
                   </p>
                   {(data.release_date || data.first_air_date) && (
                     <p className="text-gray-400 text-xs">
-                      {(data.release_date || data.first_air_date)?.substring(0, 4)}
+                      {(data.release_date || data.first_air_date)?.substring(
+                        0,
+                        4,
+                      )}
                     </p>
                   )}
                 </div>
