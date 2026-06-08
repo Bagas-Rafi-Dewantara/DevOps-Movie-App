@@ -4,7 +4,7 @@ on:
   push:
     branches: [master]
     paths-ignore:
-      - "server/**" # Hanya trigger jika ada perubahan DI LUAR folder server
+      - "server/**"
   workflow_dispatch:
 
 env:
@@ -24,7 +24,7 @@ jobs:
       - name: Validate Environment Variables
         run: |
           if [ -z "${{ secrets.ACR_USERNAME }}" ]; then
-            echo "❌ Error: ACR_USERNAME secret is not set"
+            echo " Error: ACR_USERNAME secret is not set"
             exit 1
           fi
           if [ -z "${{ secrets.ACR_PASSWORD }}" ]; then
@@ -96,56 +96,21 @@ jobs:
           echo "✅ Frontend deployed successfully!"
           echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
 
-  # JOB 3: Health Check
-  health-check:
-    name: Application Health Check
+  # JOB 3: Deployment Summary
+  deployment-summary:
+    name: Deployment Summary
     runs-on: ubuntu-latest
     needs: build-push-deploy
-    if: always()
-    continue-on-error: true
     steps:
-      - name: Wait for initial deployment
-        run: |
-          echo "⏳ Waiting for Azure deployment to propagate (90 seconds)..."
-          sleep 90
-
-      - name: Check frontend health (with extended retry)
-        run: |
-          echo "🔍 Checking frontend health..."
-          MAX_RETRIES=8
-          RETRY_COUNT=0
-          SUCCESS=false
-
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net)
-            echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
-            
-            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-              echo "✅ Frontend is healthy (HTTP $HTTP_STATUS)"
-              SUCCESS=true
-              break
-            fi
-            
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "⏳ Retrying in 20 seconds..."
-              sleep 20
-            fi
-          done
-
-          if [ "$SUCCESS" = false ]; then
-            echo "⚠️ Frontend health check failed after $MAX_RETRIES attempts"
-            echo "💡 Azure deployment might still be propagating. Check manually at:"
-            echo "   https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
-          fi
-
-      - name: Deployment Summary
+      - name: Show deployment info
         run: |
           echo "=========================================="
-          echo "FRONTEND DEPLOYMENT COMPLETED"
+          echo "FRONTEND DEPLOYMENT COMPLETED!"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
           echo "Image Tag: ${{ env.ACR_IMAGE_TAG }}"
           echo "URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+          echo "=========================================="
+          echo "Deployment finished at: $(date)"
           echo "=========================================="
