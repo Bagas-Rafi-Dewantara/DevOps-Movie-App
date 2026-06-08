@@ -32,7 +32,7 @@ const pusher = new Pusher({
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: "*", // Izinkan semua origin (untuk development)
     credentials: true,
   }),
 );
