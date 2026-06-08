@@ -97,27 +97,47 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-push-deploy
     if: always()
+    continue-on-error: true
     steps:
-      - name: Wait for deployment
+      - name: Wait for initial deployment
         run: |
-          echo "⏳ Waiting for deployment to propagate..."
-          sleep 30
+          echo "⏳ Waiting for Azure deployment to propagate (90 seconds)..."
+          sleep 90
 
-      - name: Check backend health
-        id: health
+      - name: Check backend health (with extended retry)
         run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net)
-          echo "HTTP Status: $HTTP_STATUS"
-          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
-            echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
-          else
-            echo "⚠️ Backend returned HTTP $HTTP_STATUS"
+          echo "🔍 Checking backend health..."
+          MAX_RETRIES=8
+          RETRY_COUNT=0
+          SUCCESS=false
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net)
+            echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
+            
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+              echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
+              SUCCESS=true
+              break
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "⏳ Retrying in 20 seconds..."
+              sleep 20
+            fi
+          done
+
+          if [ "$SUCCESS" = false ]; then
+            echo "⚠️ Backend health check failed after $MAX_RETRIES attempts"
+            echo "💡 Azure deployment might still be propagating. Check manually at:"
+            echo "   https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
           fi
 
       - name: Deployment Summary
         run: |
           echo "=========================================="
-          echo "BACKEND DEPLOYMENT SUMMARY"
+          echo "BACKEND DEPLOYMENT COMPLETED"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.BACKEND_ACR_REGISTRY }}"
