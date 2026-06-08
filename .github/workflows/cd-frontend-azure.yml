@@ -105,12 +105,12 @@ jobs:
       - name: Show deployment info
         run: |
           echo "=========================================="
-          echo "🎉 FRONTEND DEPLOYMENT COMPLETED!"
+          echo "FRONTEND DEPLOYMENT COMPLETED!"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
           echo "Image Tag: ${{ env.ACR_IMAGE_TAG }}"
           echo "URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
           echo "=========================================="
-          echo "✅ Deployment finished at: $(date)"
+          echo "Deployment finished at: $(date)"
           echo "=========================================="
