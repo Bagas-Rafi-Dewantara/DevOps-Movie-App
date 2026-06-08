@@ -17,8 +17,6 @@ jobs:
   validate-prerequisites:
     name: Validate Prerequisites
     runs-on: ubuntu-latest
-    outputs:
-      docker-image: ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -51,9 +49,9 @@ jobs:
           fi
           echo "✅ Frontend files validated"
 
-  # JOB 2: Build Docker Image
-  build-docker-image:
-    name: Build Docker Image
+  # JOB 2: Build, Push & Deploy
+  build-push-deploy:
+    name: Build, Push & Deploy
     runs-on: ubuntu-latest
     needs: validate-prerequisites
     steps:
@@ -68,7 +66,6 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build Docker Image (Frontend)
-        id: build
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }} \
@@ -81,37 +78,13 @@ jobs:
             -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest .
           echo "✅ Docker image built successfully"
 
-  # JOB 3: Push to ACR
-  push-to-acr:
-    name: Push Docker Image to ACR
-    runs-on: ubuntu-latest
-    needs: build-docker-image
-    steps:
-      - name: Login to ACR (Frontend)
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ env.ACR_REGISTRY }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-
       - name: Push Docker Image to ACR
-        id: push
         run: |
           docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
           docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
           echo "✅ Image pushed to ACR successfully"
 
-  # JOB 4: Deploy to Azure
-  deploy-to-azure:
-    name: Deploy to Azure App Service
-    runs-on: ubuntu-latest
-    needs: [validate-prerequisites, push-to-acr]
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Deploy to Azure Web App (Frontend)
-        id: deploy
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
@@ -123,11 +96,11 @@ jobs:
           echo "✅ Frontend deployed successfully!"
           echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
 
-  # JOB 5: Health Check
+  # JOB 3: Health Check
   health-check:
     name: Application Health Check
     runs-on: ubuntu-latest
-    needs: deploy-to-azure
+    needs: build-push-deploy
     if: always()
     steps:
       - name: Wait for deployment
@@ -149,7 +122,7 @@ jobs:
       - name: Deployment Summary
         run: |
           echo "=========================================="
-          echo "🎉 FRONTEND DEPLOYMENT SUMMARY"
+          echo "FRONTEND DEPLOYMENT SUMMARY"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
