@@ -1,0 +1,46 @@
+name: CD - Backend Production (Azure)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'server/**'  # trigger jika ada perubahan DI DALAM folder server
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: 'movie-app-backend-pso'  
+  BACKEND_ACR_REGISTRY: 'movieapp.azurecr.io'  
+  ACR_IMAGE_TAG: 'latest'
+
+jobs:
+  build-and-deploy:
+    name: Build Docker & Deploy Backend to Azure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Login to ACR (Backend)
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.BACKEND_ACR_REGISTRY }}
+          username: ${{ secrets.BACKEND_ACR_USERNAME }}
+          password: ${{ secrets.BACKEND_ACR_PASSWORD }}
+
+      - name: Build Docker Image (Backend)
+        run: |
+          cd server
+          docker build \
+            -t ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} .
+
+      - name: Push Docker Image to ACR (Backend)
+        run: |
+          docker push ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
+
+      - name: Deploy to Azure Web App (Backend)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: '${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}'
+          publish-profile: ${{ secrets.BACKEND_AZURE_WEBAPP_PUBLISH_PROFILE }}
