@@ -1,13 +1,13 @@
 {
-  "name": "server",
+  "name": "movie-app-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Movie App Backend Server",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "sashen",
   "license": "ISC",
@@ -17,7 +17,12 @@
     "express": "^4.18.2",
     "mongodb": "^7.2.0",
     "mongoose": "^7.0.0",
-    "nodemon": "^2.0.21",
     "pusher": "^5.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
