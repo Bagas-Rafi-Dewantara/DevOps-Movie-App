@@ -15,6 +15,14 @@ import { SavePerson } from "./controllers/savePerson.js";
 import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
+import { getPlaylists } from "./controllers/getPlaylists.js";
+import {
+  createPlaylist,
+  updatePlaylist,
+  deletePlaylist,
+  addMovieToPlaylist,
+  removeMovieFromPlaylist,
+} from "./controllers/managePlaylist.js";
 
 dotenv.config({ path: "../.env.local" });
 const app = express();
@@ -89,6 +97,14 @@ app.route("/find/person").get(findPerson).post(findPerson);
 app.get("/suggestion/:id", suggestionUser);
 app.get("/reviews/:movieId", getReviews);
 app.route("/save/review").get(saveReview).post(saveReview);
+
+// PLAYLIST ROUTES
+app.get("/playlists/user/:userId", getPlaylists);
+app.post("/playlist", createPlaylist);
+app.put("/playlist/:id", updatePlaylist);
+app.delete("/playlist/:id", deletePlaylist);
+app.post("/playlist/:id/movie", addMovieToPlaylist);
+app.delete("/playlist/:id/movie/:movieId", removeMovieFromPlaylist);
 
 app.listen(port, "0.0.0.0", () =>
   console.log(`Server running on port ${port}`),
