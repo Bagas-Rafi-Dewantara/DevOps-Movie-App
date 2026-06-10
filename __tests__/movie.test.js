@@ -27,7 +27,9 @@ describe("validateSaveMovie - validasi input", () => {
   });
 
   test("harus berhasil jika userId dan movieId ada", () => {
-    expect(validateSaveMovie({ userId: "uid-1", movieId: 101 }).valid).toBe(true);
+    expect(validateSaveMovie({ userId: "uid-1", movieId: 101 }).valid).toBe(
+      true,
+    );
   });
 });
 

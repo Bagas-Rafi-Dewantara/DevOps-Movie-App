@@ -14,12 +14,48 @@ const {
 
 // ── Sample data ──────────────────────────────────────────────────────────────
 const sampleMovies = [
-  { id: 1, title: "Inception", genre_ids: [28, 878], release_date: "2010-07-16", vote_average: 8.8 },
-  { id: 2, title: "The Dark Knight", genre_ids: [28, 80], release_date: "2008-07-18", vote_average: 9.0 },
-  { id: 3, title: "Interstellar", genre_ids: [878, 18], release_date: "2014-11-07", vote_average: 8.6 },
-  { id: 4, title: "Titanic", genre_ids: [18, 10749], release_date: "1997-12-19", vote_average: 7.9 },
-  { id: 5, title: "The Avengers", genre_ids: [28, 12, 878], release_date: "2012-05-04", vote_average: 8.0 },
-  { id: 6, title: "La La Land", genre_ids: [35, 10749, 18], release_date: "2016-12-09", vote_average: 8.0 },
+  {
+    id: 1,
+    title: "Inception",
+    genre_ids: [28, 878],
+    release_date: "2010-07-16",
+    vote_average: 8.8,
+  },
+  {
+    id: 2,
+    title: "The Dark Knight",
+    genre_ids: [28, 80],
+    release_date: "2008-07-18",
+    vote_average: 9.0,
+  },
+  {
+    id: 3,
+    title: "Interstellar",
+    genre_ids: [878, 18],
+    release_date: "2014-11-07",
+    vote_average: 8.6,
+  },
+  {
+    id: 4,
+    title: "Titanic",
+    genre_ids: [18, 10749],
+    release_date: "1997-12-19",
+    vote_average: 7.9,
+  },
+  {
+    id: 5,
+    title: "The Avengers",
+    genre_ids: [28, 12, 878],
+    release_date: "2012-05-04",
+    vote_average: 8.0,
+  },
+  {
+    id: 6,
+    title: "La La Land",
+    genre_ids: [35, 10749, 18],
+    release_date: "2016-12-09",
+    vote_average: 8.0,
+  },
 ];
 
 // ── filterByGenre ────────────────────────────────────────────────────────────
@@ -71,7 +107,9 @@ describe("filterByYear", () => {
 describe("sortByRatingDesc - rating tertinggi duluan", () => {
   test("film dengan rating tertinggi harus di posisi pertama", () => {
     const result = sortByRatingDesc(sampleMovies);
-    expect(result[0].vote_average).toBeGreaterThanOrEqual(result[1].vote_average);
+    expect(result[0].vote_average).toBeGreaterThanOrEqual(
+      result[1].vote_average,
+    );
   });
 
   test("film dengan rating terendah harus di posisi terakhir", () => {
@@ -92,7 +130,9 @@ describe("sortByYearDesc - film terbaru duluan", () => {
   test("film terbaru harus muncul pertama", () => {
     const result = sortByYearDesc(sampleMovies);
     const firstYear = new Date(result[0].release_date).getFullYear();
-    const lastYear = new Date(result[result.length - 1].release_date).getFullYear();
+    const lastYear = new Date(
+      result[result.length - 1].release_date,
+    ).getFullYear();
     expect(firstYear).toBeGreaterThanOrEqual(lastYear);
   });
 });
@@ -130,10 +170,15 @@ describe("filterByQuery - pencarian teks", () => {
 // ── applyFilters: kombinasi filter ───────────────────────────────────────────
 describe("applyFilters - kombinasi filter", () => {
   test("genre + sort harus bekerja bersamaan", () => {
-    const result = applyFilters(sampleMovies, { genreId: 28, sortBy: "rating_desc" });
+    const result = applyFilters(sampleMovies, {
+      genreId: 28,
+      sortBy: "rating_desc",
+    });
     expect(result.every((m) => m.genre_ids.includes(28))).toBe(true);
     if (result.length > 1) {
-      expect(result[0].vote_average).toBeGreaterThanOrEqual(result[1].vote_average);
+      expect(result[0].vote_average).toBeGreaterThanOrEqual(
+        result[1].vote_average,
+      );
     }
   });
 

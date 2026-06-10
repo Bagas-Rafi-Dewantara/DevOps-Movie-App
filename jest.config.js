@@ -1,9 +1,7 @@
 /** @type {import('jest').Config} */
 const config = {
   testEnvironment: "node",
-  collectCoverageFrom: [
-    "lib/**/*.js",
-  ],
+  collectCoverageFrom: ["lib/**/*.js"],
   coverageThreshold: {
     global: {
       statements: 80,
