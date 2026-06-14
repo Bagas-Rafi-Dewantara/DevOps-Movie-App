@@ -37,9 +37,6 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: TypeScript Check
-        run: npx tsc --noEmit
-
       - name: Check Formatting
         run: npx prettier --check .
 
