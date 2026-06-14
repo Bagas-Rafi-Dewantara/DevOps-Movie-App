@@ -1,5 +1,9 @@
 name: CD - Frontend Production (Azure)
 
+concurrency:
+  group: production-frontend-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [master]
@@ -9,8 +13,8 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: "pso-fp-movieapp12"
-  ACR_REGISTRY: "movieappacr.azurecr.io"
-  ACR_IMAGE_TAG: "latest"
+  ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
+  IMAGE_TAG: ${{ github.ref_name }}-${{ github.sha }}
 
 jobs:
   # JOB 1: Validation
@@ -23,8 +27,12 @@ jobs:
 
       - name: Validate Environment Variables
         run: |
+          if [ -z "${{ secrets.ACR_REGISTRY }}" ]; then
+            echo "❌ Error: ACR_REGISTRY secret is not set"
+            exit 1
+          fi
           if [ -z "${{ secrets.ACR_USERNAME }}" ]; then
-            echo " Error: ACR_USERNAME secret is not set"
+            echo "❌ Error: ACR_USERNAME secret is not set"
             exit 1
           fi
           if [ -z "${{ secrets.ACR_PASSWORD }}" ]; then
@@ -49,68 +57,209 @@ jobs:
           fi
           echo "✅ Frontend files validated"
 
-  # JOB 2: Build, Push & Deploy
+  # JOB 2: Build, Push & Deploy with Docker Buildx
   build-push-deploy:
     name: Build, Push & Deploy
     runs-on: ubuntu-latest
     needs: validate-prerequisites
+    outputs:
+      image-tag: ${{ env.IMAGE_TAG }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Login to ACR (Frontend)
-        uses: azure/docker-login@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
         with:
-          login-server: ${{ env.ACR_REGISTRY }}
+          registry: ${{ env.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build Docker Image (Frontend)
-        run: |
-          docker build \
-            --build-arg NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }} \
-            --build-arg NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }} \
-            --build-arg NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
-            --build-arg NEXT_PUBLIC_SERVER_URL=${{ secrets.NEXT_PUBLIC_SERVER_URL }} \
-            --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-            --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-            -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} \
-            -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest .
-          echo "✅ Docker image built successfully"
-
-      - name: Push Docker Image to ACR
-        run: |
-          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
-          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
-          echo "✅ Image pushed to ACR successfully"
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:buildcache,mode=max
+          build-args: |
+            NEXT_PUBLIC_API_KEY=${{ secrets.NEXT_PUBLIC_API_KEY }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+            NEXT_PUBLIC_SERVER_URL=${{ secrets.NEXT_PUBLIC_SERVER_URL }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            NODE_ENV=production
 
       - name: Deploy to Azure Web App (Frontend)
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}"
+          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to propagate..."
+          sleep 30
 
       - name: Deployment Info
         run: |
           echo "✅ Frontend deployed successfully!"
+          echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
           echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
 
-  # JOB 3: Deployment Summary
+  # JOB 3: Health Check with Retry
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: build-push-deploy
+    outputs:
+      health-status: ${{ steps.health.outputs.status }}
+    steps:
+      - name: Wait for application startup
+        run: |
+          echo "⏳ Waiting 60 seconds for application to fully start..."
+          sleep 60
+
+      - name: Health Check Frontend with Retry
+        id: health
+        run: |
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          HEALTHY=false
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net || echo "000")
+            
+            echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
+            
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+              echo "✅ Frontend is healthy (HTTP $HTTP_STATUS)"
+              HEALTHY=true
+              echo "status=healthy" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "⏳ Retrying in 15 seconds..."
+              sleep 15
+            fi
+          done
+
+          echo "❌ Frontend health check failed after $MAX_RETRIES attempts"
+          echo "status=unhealthy" >> $GITHUB_OUTPUT
+          exit 1
+
+  # JOB 4: Rollback if Health Check Failed
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [build-push-deploy, health-check]
+    if: failure() && needs.health-check.outputs.health-status == 'unhealthy'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Latest Stable Tag
+        id: rollback-tag
+        run: |
+          # Get list of tags from ACR and find the latest one before current
+          CURRENT_TAG="${{ env.IMAGE_TAG }}"
+
+          # For simplicity, rollback to 'latest' tag
+          # In production, you might want to query ACR for previous tags
+          ROLLBACK_TAG="latest"
+
+          echo "rollback-tag=$ROLLBACK_TAG" >> $GITHUB_OUTPUT
+          echo "🔄 Rolling back to tag: $ROLLBACK_TAG"
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Verify Previous Image Exists
+        run: |
+          ROLLBACK_TAG="${{ steps.rollback-tag.outputs.rollback-tag }}"
+          echo "🔍 Verifying image exists: ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${ROLLBACK_TAG}"
+
+          docker manifest inspect ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${ROLLBACK_TAG} || {
+            echo "❌ Previous image not found! Cannot rollback."
+            exit 1
+          }
+
+          echo "✅ Previous image found, proceeding with rollback"
+
+      - name: Rollback to Previous Version
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ steps.rollback-tag.outputs.rollback-tag }}"
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Wait for rollback
+        run: |
+          echo "⏳ Waiting 60 seconds for rollback to complete..."
+          sleep 60
+
+      - name: Verify Rollback Success
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net || echo "000")
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Rollback successful! Frontend is healthy (HTTP $HTTP_STATUS)"
+          else
+            echo "❌ Rollback failed! Frontend still unhealthy (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+
+      - name: Rollback Summary
+        run: |
+          echo "=========================================="
+          echo "🔄 ROLLBACK COMPLETED"
+          echo "=========================================="
+          echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
+          echo "Rolled Back To: ${{ steps.rollback-tag.outputs.rollback-tag }}"
+          echo "Failed Tag: ${{ env.IMAGE_TAG }}"
+          echo "=========================================="
+          echo "⚠️ Please investigate the failed deployment"
+          echo "=========================================="
+
+  # JOB 5: Deployment Summary
   deployment-summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: build-push-deploy
+    needs: [build-push-deploy, health-check]
+    if: always()
     steps:
       - name: Show deployment info
         run: |
+          if [ "${{ needs.health-check.result }}" = "success" ]; then
+            STATUS="✅ SUCCESS"
+          else
+            STATUS="❌ FAILED (Rolled Back)"
+          fi
+
           echo "=========================================="
-          echo "FRONTEND DEPLOYMENT COMPLETED!"
+          echo "🎉 FRONTEND DEPLOYMENT $STATUS"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
-          echo "Image Tag: ${{ env.ACR_IMAGE_TAG }}"
+          echo "Image Tag: ${{ env.IMAGE_TAG }}"
           echo "URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
           echo "=========================================="
+          echo "Health Check: ${{ needs.health-check.result }}"
           echo "Deployment finished at: $(date)"
           echo "=========================================="

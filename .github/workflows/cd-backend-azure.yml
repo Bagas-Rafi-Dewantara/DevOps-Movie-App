@@ -1,5 +1,9 @@
 name: CD - Backend Production (Azure)
 
+concurrency:
+  group: production-backend-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches: [master]
@@ -9,8 +13,9 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: "movie-app-backend-pso"
-  BACKEND_ACR_REGISTRY: "movieapp.azurecr.io"
-  ACR_IMAGE_TAG: "latest"
+  ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
+  IMAGE_TAG: ${{ github.ref_name }}-${{ github.sha }}
+  PREVIOUS_TAG_FILE: ".previous-backend-tag"
 
 jobs:
   # JOB 1: Validation
@@ -23,12 +28,16 @@ jobs:
 
       - name: Validate Environment Variables
         run: |
-          if [ -z "${{ secrets.BACKEND_ACR_USERNAME }}" ]; then
-            echo "❌ Error: BACKEND_ACR_USERNAME secret is not set"
+          if [ -z "${{ secrets.ACR_REGISTRY }}" ]; then
+            echo "❌ Error: ACR_REGISTRY secret is not set"
             exit 1
           fi
-          if [ -z "${{ secrets.BACKEND_ACR_PASSWORD }}" ]; then
-            echo "❌ Error: BACKEND_ACR_PASSWORD secret is not set"
+          if [ -z "${{ secrets.ACR_USERNAME }}" ]; then
+            echo "❌ Error: ACR_USERNAME secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ACR_PASSWORD }}" ]; then
+            echo "❌ Error: ACR_PASSWORD secret is not set"
             exit 1
           fi
           if [ -z "${{ secrets.BACKEND_AZURE_WEBAPP_PUBLISH_PROFILE }}" ]; then
@@ -49,63 +58,223 @@ jobs:
           fi
           echo "✅ Backend files validated"
 
-  # JOB 2: Build, Push & Deploy
+  # JOB 2: Build, Push & Deploy with Docker Buildx
   build-push-deploy:
     name: Build, Push & Deploy
     runs-on: ubuntu-latest
     needs: validate-prerequisites
+    outputs:
+      image-tag: ${{ env.IMAGE_TAG }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Login to ACR (Backend)
-        uses: azure/docker-login@v1
+      - name: Get Previous Image Tag
+        id: previous-tag
+        run: |
+          # Try to get previous tag from Azure App Service
+          PREVIOUS_TAG=$(curl -s -X GET \
+            "https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/version" \
+            -H "Accept: application/json" || echo "none")
+
+          if [ "$PREVIOUS_TAG" = "none" ] || [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, using 'latest' as fallback"
+            PREVIOUS_TAG="latest"
+          fi
+
+          echo "previous-tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "📋 Previous tag: $PREVIOUS_TAG"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
         with:
-          login-server: ${{ env.BACKEND_ACR_REGISTRY }}
-          username: ${{ secrets.BACKEND_ACR_USERNAME }}
-          password: ${{ secrets.BACKEND_ACR_PASSWORD }}
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build Docker Image (Backend)
-        run: |
-          cd server
-          docker build \
-            -t ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} \
-            -t ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest .
-          echo "✅ Docker image built successfully"
-
-      - name: Push Docker Image to ACR
-        run: |
-          docker push ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
-          docker push ${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
-          echo "✅ Image pushed to ACR successfully"
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          push: true
+          tags: |
+            ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:buildcache,mode=max
+          build-args: |
+            NODE_ENV=production
 
       - name: Deploy to Azure Web App (Backend)
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: "${{ env.BACKEND_ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}"
+          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}"
           publish-profile: ${{ secrets.BACKEND_AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting 30 seconds for deployment to propagate..."
+          sleep 30
 
       - name: Deployment Info
         run: |
           echo "✅ Backend deployed successfully!"
+          echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
+          echo "📋 Previous Tag: ${{ steps.previous-tag.outputs.previous-tag }}"
           echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
 
-  # JOB 3: Deployment Summary
+  # JOB 3: Health Check with Retry
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: build-push-deploy
+    outputs:
+      health-status: ${{ steps.health.outputs.status }}
+    steps:
+      - name: Wait for application startup
+        run: |
+          echo "⏳ Waiting 60 seconds for application to fully start..."
+          sleep 60
+
+      - name: Health Check Backend with Retry
+        id: health
+        run: |
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          HEALTHY=false
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || echo "000")
+            
+            echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
+            
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+              echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
+              HEALTHY=true
+              echo "status=healthy" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+              echo "⏳ Retrying in 15 seconds..."
+              sleep 15
+            fi
+          done
+
+          echo "❌ Backend health check failed after $MAX_RETRIES attempts"
+          echo "status=unhealthy" >> $GITHUB_OUTPUT
+          exit 1
+
+  # JOB 4: Rollback if Health Check Failed
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [build-push-deploy, health-check]
+    if: failure() && needs.health-check.outputs.health-status == 'unhealthy'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Previous Image Tag
+        id: rollback-tag
+        run: |
+          # Get previous tag from build-push-deploy job
+          PREVIOUS_TAG="${{ needs.build-push-deploy.outputs.previous-tag }}"
+
+          if [ -z "$PREVIOUS_TAG" ] || [ "$PREVIOUS_TAG" = "none" ]; then
+            echo "⚠️ No previous tag available, using 'latest'"
+            PREVIOUS_TAG="latest"
+          fi
+
+          echo "rollback-tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "🔄 Rolling back to tag: $PREVIOUS_TAG"
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Verify Previous Image Exists
+        run: |
+          ROLLBACK_TAG="${{ steps.rollback-tag.outputs.rollback-tag }}"
+          echo "🔍 Verifying image exists: ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${ROLLBACK_TAG}"
+
+          docker manifest inspect ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${ROLLBACK_TAG} || {
+            echo "❌ Previous image not found! Cannot rollback."
+            exit 1
+          }
+
+          echo "✅ Previous image found, proceeding with rollback"
+
+      - name: Rollback to Previous Version
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ steps.rollback-tag.outputs.rollback-tag }}"
+          publish-profile: ${{ secrets.BACKEND_AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Wait for rollback
+        run: |
+          echo "⏳ Waiting 60 seconds for rollback to complete..."
+          sleep 60
+
+      - name: Verify Rollback Success
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || echo "000")
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Rollback successful! Backend is healthy (HTTP $HTTP_STATUS)"
+          else
+            echo "❌ Rollback failed! Backend still unhealthy (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+
+      - name: Rollback Summary
+        run: |
+          echo "=========================================="
+          echo "🔄 ROLLBACK COMPLETED"
+          echo "=========================================="
+          echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
+          echo "Rolled Back To: ${{ steps.rollback-tag.outputs.rollback-tag }}"
+          echo "Failed Tag: ${{ env.IMAGE_TAG }}"
+          echo "=========================================="
+          echo "⚠️ Please investigate the failed deployment"
+          echo "=========================================="
+
+  # JOB 5: Deployment Summary
   deployment-summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: build-push-deploy
+    needs: [build-push-deploy, health-check]
+    if: always()
     steps:
       - name: Show deployment info
         run: |
+          if [ "${{ needs.health-check.result }}" = "success" ]; then
+            STATUS="✅ SUCCESS"
+            COLOR="32"
+          else
+            STATUS="❌ FAILED (Rolled Back)"
+            COLOR="31"
+          fi
+
           echo "=========================================="
-          echo "BACKEND DEPLOYMENT COMPLETED!"
+          echo "🎉 BACKEND DEPLOYMENT $STATUS"
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
-          echo "Registry: ${{ env.BACKEND_ACR_REGISTRY }}"
-          echo "Image Tag: ${{ env.ACR_IMAGE_TAG }}"
+          echo "Registry: ${{ env.ACR_REGISTRY }}"
+          echo "Image Tag: ${{ env.IMAGE_TAG }}"
           echo "URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
           echo "=========================================="
+          echo "Health Check: ${{ needs.health-check.result }}"
           echo "Deployment finished at: $(date)"
           echo "=========================================="
