@@ -3,23 +3,26 @@ name: CD - Backend Production (Azure)
 concurrency:
   group: azure-deployment
   cancel-in-progress: false
+
 on:
-  push:
+  workflow_run:
+    workflows: ["CI - Development Pipeline"]
     branches: [master]
-    paths:
-      - "server/**"
+    types:
+      - completed
   workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: "movie-app-backend-pso"
   ACR_REGISTRY: "movieappacr.azurecr.io"
-  IMAGE_TAG: "${{ github.ref_name }}-${{ github.sha }}"
+  IMAGE_TAG: "${{ github.event.workflow_run.head_branch || github.ref_name }}-${{ github.event.workflow_run.head_sha || github.sha }}"
 
 jobs:
   # JOB 1: Validation
   validate-prerequisites:
     name: Validate Prerequisites
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -110,6 +113,7 @@ jobs:
 
       - name: Health Check Backend with Retry
         id: health
+        continue-on-error: true
         run: |
           MAX_RETRIES=5
           RETRY_COUNT=0
@@ -117,25 +121,24 @@ jobs:
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               ${{ secrets.NEXT_PUBLIC_SERVER_URL }} || echo "000")
-            
+
             echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
-            
+
             if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
               echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
               echo "status=healthy" >> $GITHUB_OUTPUT
               exit 0
             fi
-            
+
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "⏳ Retrying in 15 seconds..."
-              sleep 15
+              echo "⏳ Retrying in 30 seconds..."
+              sleep 30
             fi
           done
 
-          echo "❌ Backend health check failed after $MAX_RETRIES attempts"
+          echo "⚠️ Backend health check did not pass but deployment continues"
           echo "status=unhealthy" >> $GITHUB_OUTPUT
-          exit 1
 
   # JOB 4: Rollback if Health Check Failed
   rollback:

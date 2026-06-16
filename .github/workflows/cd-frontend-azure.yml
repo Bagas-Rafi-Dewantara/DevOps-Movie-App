@@ -5,22 +5,24 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI - Development Pipeline"]
     branches: [master]
-    paths-ignore:
-      - "server/**"
+    types:
+      - completed
   workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: "pso-fp-movieapp12"
   ACR_REGISTRY: "movieappacr.azurecr.io"
-  IMAGE_TAG: "${{ github.ref_name }}-${{ github.sha }}"
+  IMAGE_TAG: "${{ github.event.workflow_run.head_branch || github.ref_name }}-${{ github.event.workflow_run.head_sha || github.sha }}"
 
 jobs:
   # JOB 1: Validation
   validate-prerequisites:
     name: Validate Prerequisites
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
