@@ -8,21 +8,11 @@ import { findMovies } from "./controllers/findMovie.js";
 import { findPerson } from "./controllers/findPerson.js";
 import { getMovie } from "./controllers/getMovie.js";
 import { getPerson } from "./controllers/getPerson.js";
-import { getReviews } from "./controllers/getReviews.js";
 import { getUserData } from "./controllers/getUserData.js";
 import { saveMovies } from "./controllers/saveMovie.js";
 import { SavePerson } from "./controllers/savePerson.js";
-import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
-import { getPlaylists } from "./controllers/getPlaylists.js";
-import {
-  createPlaylist,
-  updatePlaylist,
-  deletePlaylist,
-  addMovieToPlaylist,
-  removeMovieFromPlaylist,
-} from "./controllers/managePlaylist.js";
 
 dotenv.config({ path: "../.env.local" });
 const app = express();
@@ -66,13 +56,6 @@ mongoose.connection.once("open", () => {
       change: change,
     });
   });
-
-  const changeReview = mongoose.connection.collection("review-data").watch();
-  changeReview.on("change", (change) => {
-    pusher.trigger("review-data", "new-reviewData", {
-      change: change,
-    });
-  });
 });
 
 // HEALTH CHECK
@@ -95,16 +78,6 @@ app.route("/find/person").get(findPerson).post(findPerson);
 
 // OTHER ROUTES
 app.get("/suggestion/:id", suggestionUser);
-app.get("/reviews/:movieId", getReviews);
-app.route("/save/review").get(saveReview).post(saveReview);
-
-// PLAYLIST ROUTES
-app.get("/playlists/user/:userId", getPlaylists);
-app.post("/playlist", createPlaylist);
-app.put("/playlist/:id", updatePlaylist);
-app.delete("/playlist/:id", deletePlaylist);
-app.post("/playlist/:id/movie", addMovieToPlaylist);
-app.delete("/playlist/:id/movie/:movieId", removeMovieFromPlaylist);
 
 app.listen(port, "0.0.0.0", () =>
   console.log(`Server running on port ${port}`),

@@ -10,8 +10,6 @@ import Row from "@/components/Row";
 import Seasons from "@/components/Seasons";
 import ToastContainerBar from "@/components/ToastContainer";
 import Trailer from "@/components/Trailer";
-import AddToPlaylistButton from "@/components/AddToPlaylistButton";
-import UserReview from "@/components/UserReview";
 import { Details, MovieCastCrew } from "@/typings";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
@@ -143,23 +141,6 @@ function DetailsPage({}: Props) {
           movieCast={movieDetails.movieCast as unknown as MovieCastCrew}
           session={session}
         />
-        {(movieDetails.movieDetails as Details).id && (
-          <div className="px-6 md:px-24 py-4">
-            <AddToPlaylistButton
-              movieId={(movieDetails.movieDetails as Details).id}
-              mediaType={isTV ? "tv" : "movie"}
-              title={
-                (movieDetails.movieDetails as Details).title ||
-                (movieDetails.movieDetails as Details).name
-              }
-              poster_path={(movieDetails.movieDetails as Details).poster_path}
-              backdrop_path={
-                (movieDetails.movieDetails as Details).backdrop_path
-              }
-              vote_average={(movieDetails.movieDetails as Details).vote_average}
-            />
-          </div>
-        )}
         <Trailer
           movieTrailer={movieDetails.movieVideo}
           movieDetails={movieDetails.movieDetails as Details}
@@ -172,15 +153,6 @@ function DetailsPage({}: Props) {
           <Seasons movieDetails={movieDetails.movieDetails as Details} />
         )}
         <MovieReview movieReview={movieDetails.review} />
-        <UserReview
-          movieId={(movieDetails.movieDetails as Details).id}
-          mediaType={isTV ? "tv" : "movie"}
-          movieTitle={
-            (movieDetails.movieDetails as Details).title ||
-            (movieDetails.movieDetails as Details).name
-          }
-          poster_path={(movieDetails.movieDetails as Details).poster_path}
-        />
         <Row
           movies={movieDetails.similar}
           title="YOU MAY ALSO LIKE"

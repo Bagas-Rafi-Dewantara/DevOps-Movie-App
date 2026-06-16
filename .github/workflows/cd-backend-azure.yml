@@ -95,7 +95,7 @@ jobs:
           echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
           echo "🌐 URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}"
 
- # JOB 3: Health Check
+  # JOB 3: Health Check
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
@@ -136,7 +136,7 @@ jobs:
 
           echo "⚠️ Backend health check did not pass but deployment continues"
           echo "status=unhealthy" >> $GITHUB_OUTPUT
-        
+
   # JOB 4: Rollback if Health Check Failed
   rollback:
     name: Rollback Deployment

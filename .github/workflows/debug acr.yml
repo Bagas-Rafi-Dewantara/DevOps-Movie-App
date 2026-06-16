@@ -3,29 +3,29 @@
     echo "=========================================="
     echo "🔍 DEBUG: ACR Connection Test"
     echo "=========================================="
-    
+
     # Check secrets
     [ -z "${{ secrets.ACR_REGISTRY }}" ] && echo "❌ ACR_REGISTRY empty" || echo "✅ ACR_REGISTRY set: ${{ secrets.ACR_REGISTRY }}"
     [ -z "${{ secrets.ACR_USERNAME }}" ] && echo "❌ ACR_USERNAME empty" || echo "✅ ACR_USERNAME set: ${{ secrets.ACR_USERNAME }}"
     [ -z "${{ secrets.ACR_PASSWORD }}" ] && echo "❌ ACR_PASSWORD empty" || echo "✅ ACR_PASSWORD set (length: ${#${{ secrets.ACR_PASSWORD }}})"
-    
+
     # DNS test
     echo ""
     echo "🌐 DNS Test:"
     nslookup ${{ secrets.ACR_REGISTRY }} || echo "❌ DNS failed"
-    
+
     # HTTPS test
     echo ""
     echo "🔒 HTTPS Test:"
     curl -v --max-time 10 https://${{ secrets.ACR_REGISTRY }}/v2/ || echo "❌ HTTPS failed"
-    
+
     # Docker login test
     echo ""
     echo "🐳 Docker Login Test:"
     echo "${{ secrets.ACR_PASSWORD }}" | docker login ${{ secrets.ACR_REGISTRY }} \
       --username ${{ secrets.ACR_USERNAME }} \
       --password-stdin && echo "✅ Login Success" || echo "❌ Login Failed"
-    
+
     echo ""
     echo "=========================================="
     echo "✅ Debug Complete"
