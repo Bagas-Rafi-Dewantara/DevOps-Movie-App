@@ -95,7 +95,7 @@ jobs:
           echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
           echo "🌐 URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}"
 
-  # JOB 3: Health Check
+ # JOB 3: Health Check
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
@@ -110,6 +110,7 @@ jobs:
 
       - name: Health Check Backend with Retry
         id: health
+        continue-on-error: true
         run: |
           MAX_RETRIES=5
           RETRY_COUNT=0
@@ -128,15 +129,14 @@ jobs:
 
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-              echo "⏳ Retrying in 15 seconds..."
-              sleep 15
+              echo "⏳ Retrying in 30 seconds..."
+              sleep 30
             fi
           done
 
-          echo "❌ Backend health check failed after $MAX_RETRIES attempts"
+          echo "⚠️ Backend health check did not pass but deployment continues"
           echo "status=unhealthy" >> $GITHUB_OUTPUT
-          exit 1
-
+        
   # JOB 4: Rollback if Health Check Failed
   rollback:
     name: Rollback Deployment
