@@ -113,7 +113,7 @@ jobs:
         run: |
           MAX_RETRIES=5
           RETRY_COUNT=0
-          
+
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               ${{ secrets.NEXT_PUBLIC_SERVER_URL }} || echo "000")
@@ -132,7 +132,7 @@ jobs:
               sleep 15
             fi
           done
-          
+
           echo "❌ Backend health check failed after $MAX_RETRIES attempts"
           echo "status=unhealthy" >> $GITHUB_OUTPUT
           exit 1
