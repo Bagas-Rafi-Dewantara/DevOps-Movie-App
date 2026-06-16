@@ -94,7 +94,7 @@ jobs:
         run: |
           echo "✅ Backend deployed successfully!"
           echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
-          echo "🌐 URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+          echo "🌐 URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}"
 
   # JOB 3: Health Check
   health-check:
@@ -117,7 +117,7 @@ jobs:
 
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net || echo "000")
+              ${{ secrets.NEXT_PUBLIC_SERVER_URL }} || echo "000")
 
             echo "Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES: HTTP Status $HTTP_STATUS"
 
@@ -189,7 +189,7 @@ jobs:
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
           echo "Image Tag: ${{ env.IMAGE_TAG }}"
-          echo "URL: https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+          echo "URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL }}"
           echo "Health Check: ${{ needs.health-check.result }}"
           echo "Deployment finished at: $(date)"
           echo "=========================================="
