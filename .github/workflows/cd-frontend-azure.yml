@@ -14,7 +14,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: "pso-fp-movieapp12"
   ACR_REGISTRY: "movieappacr.azurecr.io"
-  ACR_IMAGE_TAG: "latest"
+  IMAGE_TAG: "${{ github.ref_name }}-${{ github.sha }}"
 
 jobs:
   # JOB 1: Validation
@@ -78,13 +78,13 @@ jobs:
             --build-arg NEXT_PUBLIC_SERVER_URL=${{ secrets.NEXT_PUBLIC_SERVER_URL }} \
             --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
             --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-            -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }} \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }} \
             -t ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest .
           echo "✅ Docker image built successfully"
 
       - name: Push Docker Image to ACR
         run: |
-          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}
           docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
           echo "✅ Image pushed to ACR successfully"
 
@@ -92,12 +92,13 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.ACR_IMAGE_TAG }}"
+          images: "${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
       - name: Deployment Info
         run: |
           echo "✅ Frontend deployed successfully!"
+          echo "🏷️ Image Tag: ${{ env.IMAGE_TAG }}"
           echo "🌐 URL: ${{ secrets.NEXTAUTH_URL }}"
 
   # JOB 3: Health Check
@@ -192,7 +193,7 @@ jobs:
           echo "=========================================="
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
-          echo "Image Tag: ${{ env.ACR_IMAGE_TAG }}"
+          echo "Image Tag: ${{ env.IMAGE_TAG }}"
           echo "URL: ${{ secrets.NEXTAUTH_URL }}"
           echo "Health Check: ${{ needs.health-check.result }}"
           echo "Deployment finished at: $(date)"
