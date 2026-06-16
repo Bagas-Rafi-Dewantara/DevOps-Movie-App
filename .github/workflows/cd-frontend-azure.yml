@@ -1,7 +1,7 @@
 name: CD - Frontend Production (Azure)
 
 concurrency:
-  group: production-frontend-${{ github.ref }}
+  group: azure-deployment
   cancel-in-progress: false
 
 on:
