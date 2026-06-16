@@ -1,9 +1,8 @@
 name: CD - Backend Production (Azure)
 
 concurrency:
-  group: production-backend-${{ github.ref }}
+  group: azure-deployment
   cancel-in-progress: false
-
 on:
   push:
     branches: [master]
