@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import GlobalLoading from "@/components/GlobalLoading";
 import HomeBanner from "@/components/HomeBanner";
 import Navbar from "@/components/Navbar";
-import PlaylistSection from "@/components/PlaylistSection";
 import Row from "@/components/Row";
 import ToastContainerBar from "@/components/ToastContainer";
 import requests from "@/utils/requests";
@@ -120,7 +119,6 @@ export default function Home() {
               title="Documentaries"
               isMain={true}
             />
-            <PlaylistSection />
           </section>
         </main>
       )}
