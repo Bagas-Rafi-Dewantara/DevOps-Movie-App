@@ -37,8 +37,15 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
       - name: Check Formatting
         run: npx prettier --check .
+
+      - name: Dependency Audit
+        run: npm audit || true
+
 
   test:
     name: Unit Testing
