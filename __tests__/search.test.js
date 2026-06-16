@@ -107,9 +107,7 @@ describe("filterByYear", () => {
 describe("sortByRatingDesc - rating tertinggi duluan", () => {
   test("film dengan rating tertinggi harus di posisi pertama", () => {
     const result = sortByRatingDesc(sampleMovies);
-    expect(result[0].vote_average).toBeGreaterThanOrEqual(
-      result[1].vote_average,
-    );
+    expect(result[0].vote_average).toBeGreaterThanOrEqual(result[1].vote_average);
   });
 
   test("film dengan rating terendah harus di posisi terakhir", () => {
@@ -130,9 +128,7 @@ describe("sortByYearDesc - film terbaru duluan", () => {
   test("film terbaru harus muncul pertama", () => {
     const result = sortByYearDesc(sampleMovies);
     const firstYear = new Date(result[0].release_date).getFullYear();
-    const lastYear = new Date(
-      result[result.length - 1].release_date,
-    ).getFullYear();
+    const lastYear = new Date(result[result.length - 1].release_date).getFullYear();
     expect(firstYear).toBeGreaterThanOrEqual(lastYear);
   });
 });
@@ -176,9 +172,7 @@ describe("applyFilters - kombinasi filter", () => {
     });
     expect(result.every((m) => m.genre_ids.includes(28))).toBe(true);
     if (result.length > 1) {
-      expect(result[0].vote_average).toBeGreaterThanOrEqual(
-        result[1].vote_average,
-      );
+      expect(result[0].vote_average).toBeGreaterThanOrEqual(result[1].vote_average);
     }
   });
 

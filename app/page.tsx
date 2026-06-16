@@ -75,11 +75,7 @@ export default function Home() {
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-    >
+    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
       <ToastContainerBar />
       <Navbar />
       <GlobalLoading isLoading={isLoading} />
@@ -87,39 +83,19 @@ export default function Home() {
         <main className="relative pl-4 pb-24 lg:space-y-24">
           <HomeBanner netflixOriginals={movie.netflixOriginals} />
           <section className="md:space-y-24 pt-20">
-            <Row
-              movies={movie.trendingNow}
-              title="Trending Now"
-              isMain={true}
-            />
+            <Row movies={movie.trendingNow} title="Trending Now" isMain={true} />
             <Row movies={movie.topRated} title="Top Rated" isMain={true} />
             <div className="pb-14">
-              <Row
-                movies={movie.actionMovies}
-                title="Action Thrillers"
-                isMain={true}
-              />
+              <Row movies={movie.actionMovies} title="Action Thrillers" isMain={true} />
             </div>
             <DividerMovieLine
               netflixOriginals={movie.netflixOriginals}
               horrorMovies={movie.horrorMovies}
             />
             <Row movies={movie.comedyMovies} title="Comedies" isMain={true} />
-            <Row
-              movies={movie.horrorMovies}
-              title="Scary Movies"
-              isMain={true}
-            />
-            <Row
-              movies={movie.romanceMovies}
-              title="Romance Movies"
-              isMain={true}
-            />
-            <Row
-              movies={movie.documentaries}
-              title="Documentaries"
-              isMain={true}
-            />
+            <Row movies={movie.horrorMovies} title="Scary Movies" isMain={true} />
+            <Row movies={movie.romanceMovies} title="Romance Movies" isMain={true} />
+            <Row movies={movie.documentaries} title="Documentaries" isMain={true} />
             <PlaylistSection />
           </section>
         </main>

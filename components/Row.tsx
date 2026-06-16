@@ -23,19 +23,14 @@ function Row({ movies, title, isMain }: Props) {
     if (rowRef.current) {
       const { scrollLeft, clientWidth } = rowRef.current;
 
-      const scrollTo =
-        direction === "left"
-          ? scrollLeft - clientWidth
-          : scrollLeft + clientWidth;
+      const scrollTo = direction === "left" ? scrollLeft - clientWidth : scrollLeft + clientWidth;
       rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
   };
 
   return (
     <div className={`${isMain && "pb-36"}`}>
-      <div
-        className={`${isMain ? "h-40" : "h-52"} space-y-0.5 md:space-y-2 px-4`}
-      >
+      <div className={`${isMain ? "h-40" : "h-52"} space-y-0.5 md:space-y-2 px-4`}>
         <Container header={title} isTop={false}>
           <div className="group relative md:-ml-2">
             <BiChevronLeftCircle

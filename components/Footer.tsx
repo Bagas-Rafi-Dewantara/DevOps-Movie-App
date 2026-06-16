@@ -12,22 +12,19 @@ function Footer({}: Props) {
     if (!user) return;
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.user.uid,
-            name: user.user.name,
-            email: user.user.email,
-            userPhotoUrl: user.user.image,
-            country: country,
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          userId: user.user.uid,
+          name: user.user.name,
+          email: user.user.email,
+          userPhotoUrl: user.user.image,
+          country: country,
+        }),
+      });
 
       const data = await response.json();
       if (data.status === "ok") {
@@ -45,9 +42,7 @@ function Footer({}: Props) {
   }, [session]);
 
   useEffect(() => {
-    fetch(
-      `https://extreme-ip-lookup.com/json/?key=${process.env.NEXT_PUBLIC_LOOKUP_KEY}`,
-    )
+    fetch(`https://extreme-ip-lookup.com/json/?key=${process.env.NEXT_PUBLIC_LOOKUP_KEY}`)
       .then((res) => res.json())
       .then((data) => setCountry(data.country));
   }, []);
@@ -56,9 +51,7 @@ function Footer({}: Props) {
     <div>
       <div className="flex flex-col text-[#737373] px-14 md:px-28 lg:px-40 xl:px-64 mt-14">
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 my-4">
-          <li className="my-1 md:mr-4 hover:underline cursor-pointer text-sm font-medium">
-            FAQ
-          </li>
+          <li className="my-1 md:mr-4 hover:underline cursor-pointer text-sm font-medium">FAQ</li>
           <li className="my-1 md:mr-4 hover:underline cursor-pointer text-sm font-medium">
             Investor Relations
           </li>
@@ -71,9 +64,7 @@ function Footer({}: Props) {
           <li className="my-1 md:mr-4 hover:underline cursor-pointer text-xs font-medium">
             Help Centre
           </li>
-          <li className="my-1 md:mr-4 hover:underline cursor-pointer text-xs font-medium">
-            Jobs
-          </li>
+          <li className="my-1 md:mr-4 hover:underline cursor-pointer text-xs font-medium">Jobs</li>
           <li className="my-1 md:mr-4 hover:underline cursor-pointer text-xs font-medium">
             Cookie Preferences
           </li>
@@ -101,9 +92,7 @@ function Footer({}: Props) {
           </li>
           <li className="my-1 md:mr-4 hover:underline cursor-pointer text-xs font-medium">
             {" "}
-            <a href="https://www.linkedin.com/in/naveen-polasa/">
-              Contact Us
-            </a>{" "}
+            <a href="https://www.linkedin.com/in/naveen-polasa/">Contact Us</a>{" "}
           </li>
         </ul>
         <button className="flex justify-center items-center font-medium h-12 w-36 border border-[#737373]">

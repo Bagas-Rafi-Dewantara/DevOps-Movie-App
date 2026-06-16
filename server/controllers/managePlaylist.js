@@ -2,8 +2,7 @@ import Playlist from "../model/playlist.model.js";
 
 export const createPlaylist = async (req, res) => {
   const { userId, name, description } = req.body;
-  if (!userId || !name)
-    return res.status(400).json({ error: "userId and name are required" });
+  if (!userId || !name) return res.status(400).json({ error: "userId and name are required" });
 
   try {
     const playlist = await Playlist.create({
@@ -27,7 +26,7 @@ export const updatePlaylist = async (req, res) => {
         ...(name && { name }),
         ...(description !== undefined && { description }),
       },
-      { new: true },
+      { new: true }
     );
     if (!playlist) return res.status(404).json({ error: "Playlist not found" });
     res.status(200).json({ status: "updated", playlist });
@@ -48,14 +47,7 @@ export const deletePlaylist = async (req, res) => {
 
 export const addMovieToPlaylist = async (req, res) => {
   const { id } = req.params;
-  const {
-    movieId,
-    mediaType,
-    title,
-    poster_path,
-    backdrop_path,
-    vote_average,
-  } = req.body;
+  const { movieId, mediaType, title, poster_path, backdrop_path, vote_average } = req.body;
 
   if (!movieId) return res.status(400).json({ error: "movieId is required" });
 
@@ -64,8 +56,7 @@ export const addMovieToPlaylist = async (req, res) => {
     if (!playlist) return res.status(404).json({ error: "Playlist not found" });
 
     const alreadyIn = playlist.movies.some((m) => m.movieId === movieId);
-    if (alreadyIn)
-      return res.status(200).json({ status: "already_added", playlist });
+    if (alreadyIn) return res.status(200).json({ status: "already_added", playlist });
 
     playlist.movies.push({
       movieId,
@@ -88,9 +79,7 @@ export const removeMovieFromPlaylist = async (req, res) => {
     const playlist = await Playlist.findById(id);
     if (!playlist) return res.status(404).json({ error: "Playlist not found" });
 
-    playlist.movies = playlist.movies.filter(
-      (m) => m.movieId !== parseInt(movieId),
-    );
+    playlist.movies = playlist.movies.filter((m) => m.movieId !== parseInt(movieId));
     await playlist.save();
     res.status(200).json({ status: "removed", playlist });
   } catch (error) {

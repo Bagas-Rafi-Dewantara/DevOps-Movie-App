@@ -9,11 +9,7 @@ import { motion } from "framer-motion";
 import { Session } from "next-auth";
 import Pusher from "pusher-js";
 import { useEffect, useState } from "react";
-import {
-  AiFillHeart,
-  AiOutlineHeart,
-  AiOutlineLoading3Quarters,
-} from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsPlayFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 
@@ -40,19 +36,16 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
     if (!user) return;
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/find/movie`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.user.uid,
-            movieId: movieId,
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/find/movie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          userId: user.user.uid,
+          movieId: movieId,
+        }),
+      });
 
       const data = await response.json();
 
@@ -74,26 +67,23 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
     try {
       setIsLoading(true);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/save/movie`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session?.user?.uid,
-            movieId: movieDetails.id,
-            title: movieDetails.title,
-            overview: movieDetails.overview,
-            name: movieDetails.name,
-            backdrop_path: movieDetails.backdrop_path,
-            poster_path: movieDetails.poster_path,
-            original_name: movieDetails.original_name,
-            vote_average: movieDetails.vote_average,
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/save/movie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          userId: session?.user?.uid,
+          movieId: movieDetails.id,
+          title: movieDetails.title,
+          overview: movieDetails.overview,
+          name: movieDetails.name,
+          backdrop_path: movieDetails.backdrop_path,
+          poster_path: movieDetails.poster_path,
+          original_name: movieDetails.original_name,
+          vote_average: movieDetails.vote_average,
+        }),
+      });
 
       const data = await response.json();
 
@@ -112,10 +102,7 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
         }
       } else return;
     } catch (error: any) {
-      console.log(
-        "🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:",
-        error,
-      );
+      console.log("🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:", error);
     }
   };
 
@@ -175,9 +162,7 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
                 sx={{
                   paddingTop: "140%",
                   ...uiConfigs.style.backgroundImage(
-                    tmdbConfigs.posterPath(
-                      movieDetails.poster_path || movieDetails.backdrop_path,
-                    ),
+                    tmdbConfigs.posterPath(movieDetails.poster_path || movieDetails.backdrop_path)
                   ),
                 }}
               />
@@ -199,18 +184,10 @@ function DetailsBanner({ movieDetails, movieCast, session }: Props) {
                   {movieDetails.title || movieDetails.name}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <CircularRate
-                    value={movieDetails.vote_average!}
-                    isPoster={false}
-                  />
+                  <CircularRate value={movieDetails.vote_average!} isPoster={false} />
                   <Divider orientation="vertical" />
                   {movieDetails?.genres?.map((genre, index) => (
-                    <Chip
-                      label={genre.name}
-                      variant="filled"
-                      color="error"
-                      key={index}
-                    />
+                    <Chip label={genre.name} variant="filled" color="error" key={index} />
                   ))}
                 </Stack>
                 <p className="text-white">{movieDetails.overview}</p>

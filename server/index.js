@@ -42,7 +42,7 @@ app.use(
   cors({
     origin: "*", // Izinkan semua origin (untuk development)
     credentials: true,
-  }),
+  })
 );
 
 // Db config
@@ -106,6 +106,4 @@ app.delete("/playlist/:id", deletePlaylist);
 app.post("/playlist/:id/movie", addMovieToPlaylist);
 app.delete("/playlist/:id/movie/:movieId", removeMovieFromPlaylist);
 
-app.listen(port, "0.0.0.0", () =>
-  console.log(`Server running on port ${port}`),
-);
+app.listen(port, "0.0.0.0", () => console.log(`Server running on port ${port}`));

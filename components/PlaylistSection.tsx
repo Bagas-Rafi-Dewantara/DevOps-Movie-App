@@ -51,15 +51,7 @@ function PlaylistCover({ movies }: { movies: PlaylistMovie[] }) {
   }
 
   if (posters.length < 4) {
-    return (
-      <Image
-        src={posters[0]}
-        alt="cover"
-        fill
-        className="object-cover"
-        sizes="160px"
-      />
-    );
+    return <Image src={posters[0]} alt="cover" fill className="object-cover" sizes="160px" />;
   }
 
   // 2×2 collage
@@ -67,13 +59,7 @@ function PlaylistCover({ movies }: { movies: PlaylistMovie[] }) {
     <div className="w-full h-full grid grid-cols-2 grid-rows-2">
       {posters.map((src, i) => (
         <div key={i} className="relative overflow-hidden">
-          <Image
-            src={src}
-            alt={`cover-${i}`}
-            fill
-            className="object-cover"
-            sizes="80px"
-          />
+          <Image src={src} alt={`cover-${i}`} fill className="object-cover" sizes="80px" />
         </div>
       ))}
     </div>
@@ -95,9 +81,7 @@ function MovieRowItem({
 
   const navigate = () => {
     router.push(
-      movie.mediaType === "movie"
-        ? `/details/movie${movie.movieId}`
-        : `/details/${movie.movieId}`,
+      movie.mediaType === "movie" ? `/details/movie${movie.movieId}` : `/details/${movie.movieId}`
     );
   };
 
@@ -179,7 +163,7 @@ function PlaylistSection() {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlists/user/${session.user.uid}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlists/user/${session.user.uid}`
       );
       const data = await res.json();
       setPlaylists(Array.isArray(data) ? data : []);
@@ -194,14 +178,11 @@ function PlaylistSection() {
     const name = newPlaylistName.trim();
     if (!name || !session) return;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlist`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: session.user.uid, name }),
-        },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/playlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.uid, name }),
+      });
       const data = await res.json();
       if (data.status === "created") {
         toast.success(`Playlist "${name}" created!`);
@@ -231,19 +212,14 @@ function PlaylistSection() {
     const name = editingName.trim();
     if (!name) return;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlist/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name }),
-        },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/playlist/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
       const data = await res.json();
       if (data.status === "updated") {
-        setPlaylists((prev) =>
-          prev.map((p) => (p._id === id ? { ...p, name } : p)),
-        );
+        setPlaylists((prev) => prev.map((p) => (p._id === id ? { ...p, name } : p)));
         setEditingId(null);
       }
     } catch {
@@ -251,21 +227,15 @@ function PlaylistSection() {
     }
   };
 
-  const removeMovieFromPlaylist = async (
-    playlistId: string,
-    movieId: number,
-  ) => {
+  const removeMovieFromPlaylist = async (playlistId: string, movieId: number) => {
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlist/${playlistId}/movie/${movieId}`,
-        { method: "DELETE" },
-      );
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/playlist/${playlistId}/movie/${movieId}`, {
+        method: "DELETE",
+      });
       setPlaylists((prev) =>
         prev.map((p) =>
-          p._id === playlistId
-            ? { ...p, movies: p.movies.filter((m) => m.movieId !== movieId) }
-            : p,
-        ),
+          p._id === playlistId ? { ...p, movies: p.movies.filter((m) => m.movieId !== movieId) } : p
+        )
       );
       toast.success("Removed from playlist");
     } catch {
@@ -281,9 +251,7 @@ function PlaylistSection() {
 
   const isDark = theme === "dark";
   const textSecondary = isDark ? "text-gray-400" : "text-gray-500";
-  const cardBg = isDark
-    ? "bg-gray-900"
-    : "bg-white border border-gray-200 shadow-sm";
+  const cardBg = isDark ? "bg-gray-900" : "bg-white border border-gray-200 shadow-sm";
   const inputBg = isDark
     ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
     : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400";
@@ -313,9 +281,7 @@ function PlaylistSection() {
 
         {/* Create input */}
         {showCreateInput && (
-          <div
-            className={`flex items-center gap-2 mb-5 p-3 rounded-lg ${cardBg}`}
-          >
+          <div className={`flex items-center gap-2 mb-5 p-3 rounded-lg ${cardBg}`}>
             <BsBookmarkPlus className="text-red-500 text-lg shrink-0" />
             <input
               type="text"
@@ -332,10 +298,7 @@ function PlaylistSection() {
               autoFocus
               className={`flex-1 bg-transparent border-b outline-none text-sm py-1 ${inputBg}`}
             />
-            <button
-              onClick={createPlaylist}
-              className="text-green-500 hover:text-green-400 p-1"
-            >
+            <button onClick={createPlaylist} className="text-green-500 hover:text-green-400 p-1">
               <AiOutlineCheck className="text-base" />
             </button>
             <button
@@ -368,9 +331,7 @@ function PlaylistSection() {
               return (
                 <div
                   key={playlist._id}
-                  onClick={() =>
-                    setSelectedId(isSelected ? null : playlist._id)
-                  }
+                  onClick={() => setSelectedId(isSelected ? null : playlist._id)}
                   className={`flex-shrink-0 w-40 rounded-lg p-3 cursor-pointer transition-all group ${hoverCard} ${
                     isSelected
                       ? isDark
@@ -401,14 +362,11 @@ function PlaylistSection() {
                       className={`w-full bg-transparent border-b outline-none text-sm font-semibold py-0.5 ${inputBg}`}
                     />
                   ) : (
-                    <p className="text-sm font-semibold truncate leading-tight">
-                      {playlist.name}
-                    </p>
+                    <p className="text-sm font-semibold truncate leading-tight">{playlist.name}</p>
                   )}
 
                   <p className={`text-xs mt-0.5 ${textSecondary}`}>
-                    {playlist.movies.length}{" "}
-                    {playlist.movies.length === 1 ? "film" : "film"}
+                    {playlist.movies.length} {playlist.movies.length === 1 ? "film" : "film"}
                   </p>
 
                   {/* Action icons — show on hover */}
@@ -467,9 +425,7 @@ function PlaylistSection() {
                 <BsCollectionPlay className="text-3xl text-gray-600 mx-auto mb-2" />
                 <p className={`text-sm ${textSecondary}`}>
                   Belum ada film. Buka halaman film dan klik{" "}
-                  <span
-                    className={`font-medium ${isDark ? "text-white" : "text-gray-800"}`}
-                  >
+                  <span className={`font-medium ${isDark ? "text-white" : "text-gray-800"}`}>
                     Add to Playlist
                   </span>
                   .
@@ -492,12 +448,7 @@ function PlaylistSection() {
                     key={movie.movieId}
                     movie={movie}
                     index={i}
-                    onRemove={() =>
-                      removeMovieFromPlaylist(
-                        selectedPlaylist._id,
-                        movie.movieId,
-                      )
-                    }
+                    onRemove={() => removeMovieFromPlaylist(selectedPlaylist._id, movie.movieId)}
                   />
                 ))}
               </div>

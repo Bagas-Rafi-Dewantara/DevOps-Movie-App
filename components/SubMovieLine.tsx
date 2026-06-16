@@ -26,9 +26,7 @@ function SubMovieLine({ movie }: Props) {
         router.push(`/details/${movie.id}`);
       }
     } else {
-      toast.error(
-        "You Need to Sign In to Look Up More Information About This Movie",
-      );
+      toast.error("You Need to Sign In to Look Up More Information About This Movie");
     }
   };
 
@@ -45,14 +43,9 @@ function SubMovieLine({ movie }: Props) {
       className="relative h-28 min-w-[180px] cursor-pointer transition-transform duration-200 ease-out md:h-[200px] md:min-w-[350px] md:hover:scale-105"
     >
       {movie.backdrop_path || movie.poster_path ? (
-        <div
-          onMouseEnter={() => setIsHover(true)}
-          onMouseLeave={() => setIsHover(false)}
-        >
+        <div onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
           <Image
-            src={`https://image.tmdb.org/t/p/w500${
-              movie.backdrop_path || movie.poster_path
-            }`}
+            src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}`}
             layout="fill"
             className="rounded-sm object-cover md:rounded"
             alt={movie?.title || movie?.name || movie?.original_name!}
@@ -71,9 +64,7 @@ function SubMovieLine({ movie }: Props) {
                 }}
               >
                 <CircularRate value={movie.vote_average} isPoster={true} />
-                <p className="text-xs">
-                  {movie.release_date || movie.first_air_date}
-                </p>
+                <p className="text-xs">{movie.release_date || movie.first_air_date}</p>
                 <p className="text-sm font-medium truncate">
                   {movie?.title || movie?.name || movie?.original_name!}
                 </p>

@@ -20,10 +20,8 @@ export const suggestionUser = async (req, res) => {
           const suggestionUser = [];
 
           while (isRun) {
-            const randomSuggestionMovie =
-              movieArr[Math.floor(Math.random() * movieArr.length)];
-            const randomSuggestionPeople =
-              peopleArr[Math.floor(Math.random() * peopleArr.length)];
+            const randomSuggestionMovie = movieArr[Math.floor(Math.random() * movieArr.length)];
+            const randomSuggestionPeople = peopleArr[Math.floor(Math.random() * peopleArr.length)];
 
             const userLikeMovies = await User.find({
               userId: { $ne: id },

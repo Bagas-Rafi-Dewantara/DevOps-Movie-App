@@ -16,9 +16,7 @@ function Trailer({ movieTrailer, movieDetails }: Props) {
       <Container
         isTop={true}
         header={`Videos |${" "}${
-          movieDetails?.title ||
-          movieDetails?.name ||
-          movieDetails?.original_name
+          movieDetails?.title || movieDetails?.name || movieDetails?.original_name
         }`}
       >
         <div className="flex items-center scrollbar-hide space-x-0.5 overflow-x-scroll md:space-x-1.0 md:p-2 h-[310px] overflow-y-hidden">

@@ -20,9 +20,7 @@ function HomeBanner({ netflixOriginals }: Props) {
   useEffect(() => {
     if (!netflixOriginals?.length) return;
 
-    setMovie(
-      netflixOriginals[Math.floor(Math.random() * netflixOriginals.length)],
-    );
+    setMovie(netflixOriginals[Math.floor(Math.random() * netflixOriginals.length)]);
   }, [netflixOriginals]);
 
   return (
@@ -44,12 +42,8 @@ function HomeBanner({ netflixOriginals }: Props) {
         {movie?.vote_average && (
           <div className="flex justify-start gap-8 items-center cursor-pointer">
             <CircularRate value={movie?.vote_average} />
-            <p className="bg-red-600 rounded-full px-2.5 py-2.5 text-sm w-20 text-center">
-              Action
-            </p>
-            <p className="bg-red-600 rounded-full px-2.5 py-2.5 text-sm w-20 text-center">
-              Drama
-            </p>
+            <p className="bg-red-600 rounded-full px-2.5 py-2.5 text-sm w-20 text-center">Action</p>
+            <p className="bg-red-600 rounded-full px-2.5 py-2.5 text-sm w-20 text-center">Drama</p>
           </div>
         )}
         <p className="max-w-xs text-shadow-md text-xs md:max-w-lg md:text-lg lg:max-w-2xl line-clamp-5">

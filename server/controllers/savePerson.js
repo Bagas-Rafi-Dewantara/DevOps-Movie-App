@@ -20,7 +20,7 @@ export const SavePerson = async (req, res) => {
           $pull: {
             likePerson: req.body.personId,
           },
-        },
+        }
       );
 
       res.json({ status: "disLike" });
@@ -41,7 +41,7 @@ export const SavePerson = async (req, res) => {
           $push: {
             likePerson: [req.body.personId],
           },
-        },
+        }
       );
 
       res.json({ status: "like" });

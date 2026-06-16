@@ -44,9 +44,7 @@ function Navbar({}: Props) {
   const textColor = theme === "dark" ? "text-white" : "text-gray-900";
 
   const navItemClass = `navBarComponents ${
-    theme === "dark"
-      ? "text-[#e5e5e5] hover:text-[#b3b3b3]"
-      : "text-gray-700 hover:text-gray-900"
+    theme === "dark" ? "text-[#e5e5e5] hover:text-[#b3b3b3]" : "text-gray-700 hover:text-gray-900"
   }`;
 
   return (
@@ -58,8 +56,7 @@ function Navbar({}: Props) {
         <ul className="hidden md:space-x-4 md:flex cursor-pointer items-center">
           <li
             className={`${navItemClass} ${
-              pathname === "/" &&
-              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/")}
           >
@@ -67,8 +64,7 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/tv" &&
-              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/tv" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/tv")}
           >
@@ -79,8 +75,7 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/people" &&
-              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/people" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/people")}
           >
@@ -88,8 +83,7 @@ function Navbar({}: Props) {
           </li>
           <li
             className={`${navItemClass} ${
-              pathname === "/search" &&
-              "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              pathname === "/search" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
             }`}
             onClick={() => router.push("/search")}
           >
@@ -98,8 +92,7 @@ function Navbar({}: Props) {
           {session && (
             <li
               className={`${navItemClass} ${
-                pathname === "/profile" &&
-                "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+                pathname === "/profile" && "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
               }`}
               onClick={() => router.push("/profile")}
             >
@@ -120,11 +113,7 @@ function Navbar({}: Props) {
               : "hover:bg-gray-200 text-gray-700"
           }`}
         >
-          {theme === "dark" ? (
-            <BsSun className="text-xl" />
-          ) : (
-            <BsMoon className="text-xl" />
-          )}
+          {theme === "dark" ? <BsSun className="text-xl" /> : <BsMoon className="text-xl" />}
         </button>
 
         {session ? (
@@ -143,12 +132,8 @@ function Navbar({}: Props) {
               onClose={handleClose}
               MenuListProps={{ "aria-labelledby": "basic-button" }}
             >
-              <MenuItem onClick={() => router.push("/profile")}>
-                Profile
-              </MenuItem>
-              <MenuItem onClick={() => router.push("/profile")}>
-                My account
-              </MenuItem>
+              <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
+              <MenuItem onClick={() => router.push("/profile")}>My account</MenuItem>
               <MenuItem onClick={() => signOut()}>Logout</MenuItem>
             </Menu>
           </div>

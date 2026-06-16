@@ -3,11 +3,7 @@
  * Menguji logika validasi sesi dan proteksi akses user.
  */
 
-const {
-  getUserFromSession,
-  isAuthenticated,
-  requireAuth,
-} = require("../lib/auth.utils");
+const { getUserFromSession, isAuthenticated, requireAuth } = require("../lib/auth.utils");
 
 // ── isAuthenticated ──────────────────────────────────────────────────────────
 describe("isAuthenticated", () => {

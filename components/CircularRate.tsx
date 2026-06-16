@@ -33,12 +33,7 @@ function CircularRate({ value, isPoster }: Props) {
           justifyContent: "center",
         }}
       >
-        <Typography
-          variant="caption"
-          component="div"
-          fontWeight="700"
-          sx={{ marginTop: "-5px" }}
-        >
+        <Typography variant="caption" component="div" fontWeight="700" sx={{ marginTop: "-5px" }}>
           {Math.floor(value * 10) / 10}
         </Typography>
       </Box>

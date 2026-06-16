@@ -20,9 +20,7 @@ function PersonMapping({ person }: Props) {
     if (session) {
       router.push(`/cast/${person.id}`);
     } else {
-      toast.error(
-        "You Need to Sign In to Look Up More Information About This Person",
-      );
+      toast.error("You Need to Sign In to Look Up More Information About This Person");
     }
   };
 
@@ -38,15 +36,8 @@ function PersonMapping({ person }: Props) {
       }}
       onClick={() => navigatePage()}
     >
-      <div
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-      >
-        <img
-          src={`${baseURL}${person.profile_path}`}
-          alt=""
-          className="w-56 m-auto"
-        />
+      <div onMouseEnter={() => setIsHover(true)} onMouseLeave={() => setIsHover(false)}>
+        <img src={`${baseURL}${person.profile_path}`} alt="" className="w-56 m-auto" />
         {isHover && (
           <>
             <motion.div

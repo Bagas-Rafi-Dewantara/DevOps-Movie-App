@@ -29,12 +29,7 @@ type Props = {
   poster_path?: string;
 };
 
-function UserReview({
-  movieId,
-  mediaType = "movie",
-  movieTitle = "",
-  poster_path = "",
-}: Props) {
+function UserReview({ movieId, mediaType = "movie", movieTitle = "", poster_path = "" }: Props) {
   const { data: session } = useSession();
   const { theme } = useTheme();
   const [reviews, setReviews] = useState<UserReviewData[]>([]);
@@ -44,16 +39,13 @@ function UserReview({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [userExistingReview, setUserExistingReview] =
-    useState<UserReviewData | null>(null);
+  const [userExistingReview, setUserExistingReview] = useState<UserReviewData | null>(null);
 
   const fetchReviews = async () => {
     if (!movieId) return;
     try {
       setIsLoading(true);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/${movieId}`,
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/reviews/${movieId}`);
       const data: UserReviewData[] = await res.json();
       setReviews(data);
 
@@ -90,31 +82,26 @@ function UserReview({
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/save/review`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: session.user.uid,
-            movieId,
-            mediaType,
-            rating,
-            content: content.trim(),
-            userName: session.user.name,
-            userPhoto: session.user.image,
-            movieTitle,
-            poster_path,
-          }),
-        },
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/save/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: session.user.uid,
+          movieId,
+          mediaType,
+          rating,
+          content: content.trim(),
+          userName: session.user.name,
+          userPhoto: session.user.image,
+          movieTitle,
+          poster_path,
+        }),
+      });
 
       const data = await res.json();
 
       if (data.status === "created" || data.status === "updated") {
-        toast.success(
-          data.status === "created" ? "Review submitted!" : "Review updated!",
-        );
+        toast.success(data.status === "created" ? "Review submitted!" : "Review updated!");
         setShowForm(false);
         await fetchReviews();
       } else {
@@ -132,10 +119,7 @@ function UserReview({
   }, [movieId, session]);
 
   // Theme helpers
-  const cardBg =
-    theme === "dark"
-      ? "bg-gray-900"
-      : "bg-white border border-gray-200 shadow-sm";
+  const cardBg = theme === "dark" ? "bg-gray-900" : "bg-white border border-gray-200 shadow-sm";
   const inputBg =
     theme === "dark"
       ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
@@ -145,16 +129,11 @@ function UserReview({
     theme === "dark"
       ? "bg-gray-700 hover:bg-gray-600 text-white"
       : "bg-gray-200 hover:bg-gray-300 text-gray-800";
-  const avgBg =
-    theme === "dark"
-      ? "bg-gray-800 border-gray-700"
-      : "bg-gray-50 border-gray-200";
+  const avgBg = theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200";
 
   const avgRating =
     reviews.length > 0
-      ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        ).toFixed(1)
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : null;
 
   return (
@@ -162,9 +141,7 @@ function UserReview({
       <Container header="User Reviews">
         {/* Summary bar */}
         {reviews.length > 0 && (
-          <div
-            className={`flex items-center gap-4 p-4 rounded-lg border ${avgBg} mb-4`}
-          >
+          <div className={`flex items-center gap-4 p-4 rounded-lg border ${avgBg} mb-4`}>
             <div className="text-center">
               <p className="text-3xl font-bold text-yellow-400">{avgRating}</p>
               <p className={`text-xs ${textSecondary}`}>Average</p>
@@ -197,11 +174,7 @@ function UserReview({
               onClick={() => setShowForm(!showForm)}
               className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md text-sm font-medium transition-colors"
             >
-              {showForm
-                ? "Cancel"
-                : userExistingReview
-                  ? "Edit Your Review"
-                  : "Write a Review"}
+              {showForm ? "Cancel" : userExistingReview ? "Edit Your Review" : "Write a Review"}
             </button>
           </div>
         )}
@@ -215,9 +188,7 @@ function UserReview({
 
             {/* Star rating */}
             <div className="mb-5">
-              <p className={`text-xs font-medium mb-2 ${textSecondary}`}>
-                Rating (tap a star)
-              </p>
+              <p className={`text-xs font-medium mb-2 ${textSecondary}`}>Rating (tap a star)</p>
               <div className="flex items-center gap-1 flex-wrap">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                   <button
@@ -236,9 +207,7 @@ function UserReview({
                   </button>
                 ))}
                 {(hoverRating || rating) > 0 && (
-                  <span
-                    className={`ml-2 text-sm font-semibold ${textSecondary}`}
-                  >
+                  <span className={`ml-2 text-sm font-semibold ${textSecondary}`}>
                     {hoverRating || rating}/10
                   </span>
                 )}
@@ -247,9 +216,7 @@ function UserReview({
 
             {/* Text area */}
             <div className="mb-5">
-              <p className={`text-xs font-medium mb-2 ${textSecondary}`}>
-                Your thoughts
-              </p>
+              <p className={`text-xs font-medium mb-2 ${textSecondary}`}>Your thoughts</p>
               <textarea
                 className={`w-full rounded-md p-3 text-sm border focus:outline-none focus:ring-2 focus:ring-red-500 resize-none transition-colors ${inputBg}`}
                 rows={4}
@@ -283,16 +250,12 @@ function UserReview({
 
         {/* Reviews list */}
         {isLoading ? (
-          <div className={`text-center py-8 text-sm ${textSecondary}`}>
-            Loading reviews…
-          </div>
+          <div className={`text-center py-8 text-sm ${textSecondary}`}>Loading reviews…</div>
         ) : reviews.length === 0 ? (
           <div className={`text-center py-10 ${textSecondary}`}>
             <p className="text-4xl mb-3">💬</p>
             <p className="text-sm font-medium">No user reviews yet.</p>
-            {session && (
-              <p className="text-xs mt-1">Be the first to leave a review!</p>
-            )}
+            {session && <p className="text-xs mt-1">Be the first to leave a review!</p>}
           </div>
         ) : (
           <div className="space-y-4 max-h-[480px] overflow-y-auto scrollbar-hide pr-1">
@@ -328,16 +291,12 @@ function UserReview({
                           )}
                         </span>
                       ))}
-                      <span
-                        className={`text-xs ml-1 font-medium ${textSecondary}`}
-                      >
+                      <span className={`text-xs ml-1 font-medium ${textSecondary}`}>
                         {review.rating}/10
                       </span>
                     </div>
 
-                    <p className={`text-sm leading-relaxed ${textSecondary}`}>
-                      {review.content}
-                    </p>
+                    <p className={`text-sm leading-relaxed ${textSecondary}`}>{review.content}</p>
                   </div>
                 </div>
               </div>

@@ -11,7 +11,7 @@ const PersonData = new mongoose.Schema(
     known_for_department: String,
     time: { type: Date, default: Date.now },
   },
-  { collection: "person-data" },
+  { collection: "person-data" }
 );
 
 export default mongoose.model("PersonData", PersonData);

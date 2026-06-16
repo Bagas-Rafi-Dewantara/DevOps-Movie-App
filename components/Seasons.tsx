@@ -19,9 +19,7 @@ function Seasons({ movieDetails }: Props) {
     if (session) {
       router.push(`/season/${sessionId}?sessionNumber=${sessionNumber}`);
     } else {
-      toast.error(
-        "You Need to Sign In to Look Up More Information About This Session",
-      );
+      toast.error("You Need to Sign In to Look Up More Information About This Session");
     }
   };
 
@@ -40,14 +38,10 @@ function Seasons({ movieDetails }: Props) {
               }}
               key={season.id}
               className="relative h-28 min-w-[180px] cursor-pointer transition-transform duration-200 ease-out md:h-[400px] md:min-w-[200px] items-center hover:shadow-2xl"
-              onClick={() =>
-                navigatePage(movieDetails.id, season.season_number)
-              }
+              onClick={() => navigatePage(movieDetails.id, season.season_number)}
             >
               <p
-                className={`text-lg py-2.5 text-gray-400 ${
-                  !season.poster_path && "animate-pulse"
-                }`}
+                className={`text-lg py-2.5 text-gray-400 ${!season.poster_path && "animate-pulse"}`}
               >
                 {season.name}
               </p>
@@ -91,9 +85,7 @@ function Seasons({ movieDetails }: Props) {
                 }`}
               >
                 Air Date:{" "}
-                <span className="text-white">
-                  {season.air_date ? season.air_date : "Not Yet"}
-                </span>
+                <span className="text-white">{season.air_date ? season.air_date : "Not Yet"}</span>
               </p>
             </motion.div>
           ))}

@@ -53,10 +53,7 @@ function AddToPlaylistButton({
   // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
@@ -68,7 +65,7 @@ function AddToPlaylistButton({
     if (!session?.user?.uid) return;
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlists/user/${session.user.uid}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlists/user/${session.user.uid}`
       );
       const data = await res.json();
       setPlaylists(Array.isArray(data) ? data : []);
@@ -83,8 +80,7 @@ function AddToPlaylistButton({
 
   if (!session || !movieId) return null;
 
-  const isInPlaylist = (p: Playlist) =>
-    p.movies.some((m) => m.movieId === movieId);
+  const isInPlaylist = (p: Playlist) => p.movies.some((m) => m.movieId === movieId);
 
   const toggleMovie = async (playlist: Playlist) => {
     const inList = isInPlaylist(playlist);
@@ -94,14 +90,14 @@ function AddToPlaylistButton({
       if (inList) {
         await fetch(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/playlist/${playlist._id}/movie/${movieId}`,
-          { method: "DELETE" },
+          { method: "DELETE" }
         );
         setPlaylists((prev) =>
           prev.map((p) =>
             p._id === playlist._id
               ? { ...p, movies: p.movies.filter((m) => m.movieId !== movieId) }
-              : p,
-          ),
+              : p
+          )
         );
         toast.success(`Removed from "${playlist.name}"`);
       } else {
@@ -118,13 +114,11 @@ function AddToPlaylistButton({
               backdrop_path,
               vote_average,
             }),
-          },
+          }
         );
         const data = await res.json();
         if (data.playlist) {
-          setPlaylists((prev) =>
-            prev.map((p) => (p._id === playlist._id ? data.playlist : p)),
-          );
+          setPlaylists((prev) => prev.map((p) => (p._id === playlist._id ? data.playlist : p)));
         }
         toast.success(`Added to "${playlist.name}"`);
       }
@@ -145,14 +139,11 @@ function AddToPlaylistButton({
     setIsCreating(true);
     try {
       // 1. Create playlist
-      const createRes = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/playlist`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: session.user.uid, name }),
-        },
-      );
+      const createRes = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/playlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.uid, name }),
+      });
       const createData = await createRes.json();
       if (createData.status !== "created") throw new Error("Create failed");
 
@@ -172,7 +163,7 @@ function AddToPlaylistButton({
             backdrop_path,
             vote_average,
           }),
-        },
+        }
       );
       const addData = await addRes.json();
 
@@ -223,9 +214,7 @@ function AddToPlaylistButton({
           className={`absolute left-0 top-full mt-2 w-72 rounded-xl border z-50 overflow-hidden ${dropBg}`}
         >
           {/* Dropdown header */}
-          <div
-            className={`px-4 py-3 border-b ${divider} flex items-center gap-2`}
-          >
+          <div className={`px-4 py-3 border-b ${divider} flex items-center gap-2`}>
             <BsCollectionPlay className="text-red-500 text-base shrink-0" />
             <p className="text-sm font-semibold">Add to Playlist</p>
           </div>
@@ -235,9 +224,7 @@ function AddToPlaylistButton({
             {playlists.length === 0 ? (
               <div className="px-4 py-6 text-center">
                 <BsCollectionPlay className="text-3xl text-gray-500 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">
-                  No playlists yet. Create one below!
-                </p>
+                <p className="text-xs text-gray-500">No playlists yet. Create one below!</p>
               </div>
             ) : (
               playlists.map((playlist) => {
@@ -252,9 +239,7 @@ function AddToPlaylistButton({
                   >
                     <span className="truncate text-left">{playlist.name}</span>
                     <span className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className="text-xs text-gray-500">
-                        {playlist.movies.length}
-                      </span>
+                      <span className="text-xs text-gray-500">{playlist.movies.length}</span>
                       {loading ? (
                         <AiOutlineLoading3Quarters className="text-gray-400 text-sm animate-spin" />
                       ) : inList ? (

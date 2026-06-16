@@ -80,12 +80,8 @@ function MainProfile({ userMovieData, userPersonData, userData }: Props) {
               className="w-[100px] height-[100px] rounded-full shadow-md block border-2 border-gray-400 px-1 py-1"
             />
           </div>
-          <h2 className="mt-[60px] md:mt-[40px] font-bold text-[22px] mb-[5px]">
-            {userData.name}
-          </h2>
-          <p className="text-[0.9rem] text-[#818181] m-[0]">
-            {userData.country}
-          </p>
+          <h2 className="mt-[60px] md:mt-[40px] font-bold text-[22px] mb-[5px]">{userData.name}</h2>
+          <p className="text-[0.9rem] text-[#818181] m-[0]">{userData.country}</p>
           <p className="text-[0.9rem] text-[#818181] m-[0]">{userData.email}</p>
 
           <ul className="justify-between relative mt-[35px] mb-[0] after:absolute after:bottom-[-16px] after:block after:bg-[#cccccc] after:h-[1px] after:w-[100%]">
@@ -125,8 +121,7 @@ function MainProfile({ userMovieData, userPersonData, userData }: Props) {
               <li onClick={() => setIsFavouring(true)}>
                 <a
                   className={`uppercase text-gray-500 ${
-                    ifFavorite &&
-                    "bg-gray-900 font-medium border border-gray-800 px-2.5 py-2.5"
+                    ifFavorite && "bg-gray-900 font-medium border border-gray-800 px-2.5 py-2.5"
                   }`}
                   href="#"
                 >
@@ -136,8 +131,7 @@ function MainProfile({ userMovieData, userPersonData, userData }: Props) {
               <li onClick={() => setIsFavouring(false)}>
                 <a
                   className={`uppercase text-gray-500 ${
-                    !ifFavorite &&
-                    "bg-gray-900 font-medium border border-gray-800 px-2.5 py-2.5"
+                    !ifFavorite && "bg-gray-900 font-medium border border-gray-800 px-2.5 py-2.5"
                   }`}
                   href="#"
                 >
@@ -183,10 +177,7 @@ function MainProfile({ userMovieData, userPersonData, userData }: Props) {
                     />
                     <>
                       <div className="absolute top-[190px] z-50 items-center ml-6 w-[160px]">
-                        <CircularRate
-                          value={movie.vote_average}
-                          isPoster={true}
-                        />
+                        <CircularRate value={movie.vote_average} isPoster={true} />
                         <p className="text-sm font-medium truncate">
                           {movie?.title || movie?.name || movie?.original_name!}
                         </p>
@@ -218,13 +209,8 @@ function MainProfile({ userMovieData, userPersonData, userData }: Props) {
                     />
                     <>
                       <div className="absolute top-[190px] z-50 items-center ml-6 w-[160px]">
-                        <CircularRate
-                          value={cast.popularity / 100}
-                          isPoster={true}
-                        />
-                        <p className="text-sm font-medium truncate">
-                          {cast.name}
-                        </p>
+                        <CircularRate value={cast.popularity / 100} isPoster={true} />
+                        <p className="text-sm font-medium truncate">{cast.name}</p>
                       </div>
                       <div className="absolute w-full h-[200px] bg-gradient-to-t from-black to-transparent bottom-0 z-20" />
                     </>

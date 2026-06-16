@@ -17,25 +17,20 @@ function EffectCardsSweeper({ movieImage, movieDetails }: Props) {
           <div className="inline-block md:flex justify-center py-4">
             <ImageSwiper movieImage={movieImage} />
             <div className="h-[60vh] w-[90vh] items-center space-y-8">
-              {movieDetails.production_companies
-                ?.slice(0, 4)
-                .map((companies, index) => (
-                  <div
-                    key={companies.id}
-                    className="flex justify-start space-x-10 items-center"
-                  >
-                    <p className="text-lg font-medium">
-                      {index + 1}. {companies.name}
-                    </p>
-                    {companies.logo_path && (
-                      <img
-                        src={`${baseURL}${companies.logo_path}`}
-                        className="w-24"
-                        alt={companies.name}
-                      />
-                    )}
-                  </div>
-                ))}
+              {movieDetails.production_companies?.slice(0, 4).map((companies, index) => (
+                <div key={companies.id} className="flex justify-start space-x-10 items-center">
+                  <p className="text-lg font-medium">
+                    {index + 1}. {companies.name}
+                  </p>
+                  {companies.logo_path && (
+                    <img
+                      src={`${baseURL}${companies.logo_path}`}
+                      className="w-24"
+                      alt={companies.name}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>

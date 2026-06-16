@@ -8,11 +8,7 @@ import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import Pusher from "pusher-js";
 import { useEffect, useState } from "react";
-import {
-  AiFillHeart,
-  AiOutlineHeart,
-  AiOutlineLoading3Quarters,
-} from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "react-toastify";
 import CircularRate from "./CircularRate";
 
@@ -35,19 +31,16 @@ function PersonBanner({ personData, taggedImages }: Props) {
     if (!user && !personId) return;
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/find/person`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: user.user.uid,
-            personId: personId,
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/find/person`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          userId: user.user.uid,
+          personId: personId,
+        }),
+      });
 
       const data = await response.json();
 
@@ -67,24 +60,21 @@ function PersonBanner({ personData, taggedImages }: Props) {
     try {
       setIsLoading(true);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/save/person`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: session?.user?.uid,
-            personId: personData.id,
-            gender: personData.gender,
-            name: personData.name,
-            popularity: personData.popularity,
-            profile_path: personData.profile_path,
-            known_for_department: "Action",
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/save/person`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          userId: session?.user?.uid,
+          personId: personData.id,
+          gender: personData.gender,
+          name: personData.name,
+          popularity: personData.popularity,
+          profile_path: personData.profile_path,
+          known_for_department: "Action",
+        }),
+      });
 
       const data = await response.json();
 
@@ -103,10 +93,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
         }
       } else return;
     } catch (error: any) {
-      console.log(
-        "🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:",
-        error,
-      );
+      console.log("🚀 ~ file: DetailsBanner.tsx:60 ~ addFavorite ~ error:", error);
     }
   };
 
@@ -127,9 +114,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
           paddingTop: { xs: "60%", sm: "40%", md: "35%" },
           backgroundPosition: "top",
           backgroundSize: "cover",
-          backgroundImage: `url(${baseURL}${
-            movie?.backdrop_path || movie?.poster_path
-          })`,
+          backgroundImage: `url(${baseURL}${movie?.backdrop_path || movie?.poster_path})`,
           backgroundAttachment: "fixed",
           "&::before": {
             content: '""',
@@ -170,7 +155,7 @@ function PersonBanner({ personData, taggedImages }: Props) {
                 sx={{
                   paddingTop: "140%",
                   ...uiConfigs.style.backgroundImage(
-                    tmdbConfigs.posterPath(personData.profile_path),
+                    tmdbConfigs.posterPath(personData.profile_path)
                   ),
                 }}
               />
@@ -193,26 +178,14 @@ function PersonBanner({ personData, taggedImages }: Props) {
                 </Typography>
                 <div className="flex justify-start gap-x-20">
                   <p>Birthday: {personData.birthday}</p>
-                  {personData.deathday && (
-                    <p>Deathday: {personData.deathday}</p>
-                  )}
+                  {personData.deathday && <p>Deathday: {personData.deathday}</p>}
                 </div>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <CircularRate
-                    value={personData.popularity / 100!}
-                    isPoster={false}
-                  />
+                  <CircularRate value={personData.popularity / 100!} isPoster={false} />
                   <Divider orientation="vertical" />
-                  {personData?.also_known_as
-                    ?.slice(0, 4)
-                    .map((genre, index) => (
-                      <Chip
-                        label={genre}
-                        variant="filled"
-                        color="error"
-                        key={index}
-                      />
-                    ))}
+                  {personData?.also_known_as?.slice(0, 4).map((genre, index) => (
+                    <Chip label={genre} variant="filled" color="error" key={index} />
+                  ))}
                 </Stack>
                 <Stack direction="row" spacing={1}>
                   {session && (

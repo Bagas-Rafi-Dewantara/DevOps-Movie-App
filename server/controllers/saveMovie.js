@@ -20,7 +20,7 @@ export const saveMovies = async (req, res) => {
           $pull: {
             likeMovies: req.body.movieId,
           },
-        },
+        }
       );
 
       res.json({ status: "disLike" });
@@ -43,7 +43,7 @@ export const saveMovies = async (req, res) => {
           $push: {
             likeMovies: [req.body.movieId],
           },
-        },
+        }
       );
 
       res.json({ status: "like" });

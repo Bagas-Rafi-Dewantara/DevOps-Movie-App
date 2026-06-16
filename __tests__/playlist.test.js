@@ -27,9 +27,7 @@ describe("createPlaylist - validasi input", () => {
   });
 
   test("harus gagal (400) jika name hanya spasi", () => {
-    expect(validateCreate({ userId: "uid-123", name: "   " }).valid).toBe(
-      false,
-    );
+    expect(validateCreate({ userId: "uid-123", name: "   " }).valid).toBe(false);
   });
 
   test("harus berhasil (201) dengan data lengkap", () => {

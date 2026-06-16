@@ -47,60 +47,47 @@ function DetailsPage({}: Props) {
 
       setLoading(true);
 
-      const [
-        movieVideo,
-        movieCast,
-        movieDetails,
-        similar,
-        images,
-        movieReview,
-      ] = await Promise.all([
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}/videos?api_key=${
-            process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`,
-        ).then((res) => res.json()),
+      const [movieVideo, movieCast, movieDetails, similar, images, movieReview] = await Promise.all(
+        [
+          fetch(
+            `https://api.themoviedb.org/3/${isInclude ? "movie" : "tv"}/${movieID}/videos?api_key=${
+              process.env.NEXT_PUBLIC_API_KEY
+            }&language=en-US`
+          ).then((res) => res.json()),
 
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}/credits?api_key=${
-            process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`,
-        ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/${
+              isInclude ? "movie" : "tv"
+            }/${movieID}/credits?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US`
+          ).then((res) => res.json()),
 
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}?api_key=${
-            process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US`,
-        ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/${isInclude ? "movie" : "tv"}/${movieID}?api_key=${
+              process.env.NEXT_PUBLIC_API_KEY
+            }&language=en-US`
+          ).then((res) => res.json()),
 
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}/recommendations?api_key=${
-            process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US&page=1`,
-        ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/${
+              isInclude ? "movie" : "tv"
+            }/${movieID}/recommendations?api_key=${
+              process.env.NEXT_PUBLIC_API_KEY
+            }&language=en-US&page=1`
+          ).then((res) => res.json()),
 
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}/images?api_key=${process.env.NEXT_PUBLIC_API_KEY}`,
-        ).then((res) => res.json()),
+          fetch(
+            `https://api.themoviedb.org/3/${
+              isInclude ? "movie" : "tv"
+            }/${movieID}/images?api_key=${process.env.NEXT_PUBLIC_API_KEY}`
+          ).then((res) => res.json()),
 
-        fetch(
-          `https://api.themoviedb.org/3/${
-            isInclude ? "movie" : "tv"
-          }/${movieID}/reviews?api_key=${
-            process.env.NEXT_PUBLIC_API_KEY
-          }&language=en-US&page=1`,
-        ).then((res) => res.json()),
-      ]);
+          fetch(
+            `https://api.themoviedb.org/3/${
+              isInclude ? "movie" : "tv"
+            }/${movieID}/reviews?api_key=${process.env.NEXT_PUBLIC_API_KEY}&language=en-US&page=1`
+          ).then((res) => res.json()),
+        ]
+      );
 
       setMovieDetails((prev) => ({
         ...prev,
@@ -153,9 +140,7 @@ function DetailsPage({}: Props) {
                 (movieDetails.movieDetails as Details).name
               }
               poster_path={(movieDetails.movieDetails as Details).poster_path}
-              backdrop_path={
-                (movieDetails.movieDetails as Details).backdrop_path
-              }
+              backdrop_path={(movieDetails.movieDetails as Details).backdrop_path}
               vote_average={(movieDetails.movieDetails as Details).vote_average}
             />
           </div>
@@ -168,9 +153,7 @@ function DetailsPage({}: Props) {
           movieImage={movieDetails.images}
           movieDetails={movieDetails.movieDetails as Details}
         />
-        {isTV && (
-          <Seasons movieDetails={movieDetails.movieDetails as Details} />
-        )}
+        {isTV && <Seasons movieDetails={movieDetails.movieDetails as Details} />}
         <MovieReview movieReview={movieDetails.review} />
         <UserReview
           movieId={(movieDetails.movieDetails as Details).id}
@@ -181,11 +164,7 @@ function DetailsPage({}: Props) {
           }
           poster_path={(movieDetails.movieDetails as Details).poster_path}
         />
-        <Row
-          movies={movieDetails.similar}
-          title="YOU MAY ALSO LIKE"
-          isMain={false}
-        />
+        <Row movies={movieDetails.similar} title="YOU MAY ALSO LIKE" isMain={false} />
       </main>
       <Footer />
     </motion.div>

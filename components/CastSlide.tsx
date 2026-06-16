@@ -23,9 +23,7 @@ function CastSlide({ casts }: Props) {
     if (session) {
       router.push(`/cast/${castID}`);
     } else {
-      toast.error(
-        "You Need to Sign In to Look Up More Information About This Person",
-      );
+      toast.error("You Need to Sign In to Look Up More Information About This Person");
     }
   };
 
@@ -51,9 +49,7 @@ function CastSlide({ casts }: Props) {
               sx={{
                 paddingTop: "120%",
                 color: "text.primary",
-                ...uiConfigs.style.backgroundImage(
-                  tmdbConfigs.posterPath(cast.profile_path),
-                ),
+                ...uiConfigs.style.backgroundImage(tmdbConfigs.posterPath(cast.profile_path)),
                 cursor: "pointer",
               }}
               onClick={() => navigatePage(cast.id)}
@@ -68,10 +64,7 @@ function CastSlide({ casts }: Props) {
                   backgroundColor: "rgba(0,0,0,0.6)",
                 }}
               >
-                <Typography
-                  sx={{ ...uiConfigs.style.typoLines(1, "left") }}
-                  color="#fff"
-                >
+                <Typography sx={{ ...uiConfigs.style.typoLines(1, "left") }} color="#fff">
                   {cast.name}
                 </Typography>
               </Box>

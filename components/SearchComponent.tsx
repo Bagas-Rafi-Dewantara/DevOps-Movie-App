@@ -150,7 +150,7 @@ function SearchComponent({}: Props) {
       toast.error(
         option === "person"
           ? "You Need to Sign In to Look Up More Information About This Person"
-          : "You Need to Sign In to Look Up More Information About This Movie",
+          : "You Need to Sign In to Look Up More Information About This Movie"
       );
     }
   };
@@ -161,8 +161,7 @@ function SearchComponent({}: Props) {
     setSortBy("popularity.desc");
   };
 
-  const hasActiveFilters =
-    selectedGenre || selectedYear || sortBy !== "popularity.desc";
+  const hasActiveFilters = selectedGenre || selectedYear || sortBy !== "popularity.desc";
 
   useEffect(() => {
     fetchSearchData();
@@ -176,16 +175,12 @@ function SearchComponent({}: Props) {
   }, [option]);
 
   // Theme-aware classes
-  const cardBg =
-    theme === "dark"
-      ? "bg-gray-800 border-gray-700"
-      : "bg-white border-gray-200";
+  const cardBg = theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
   const inputBg =
     theme === "dark"
       ? "bg-gray-800 border-gray-600 text-white"
       : "bg-white border-gray-200 text-gray-900";
-  const selectBg =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900";
+  const selectBg = theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900";
   const labelText = theme === "dark" ? "text-gray-300" : "text-gray-600";
 
   return (
@@ -210,9 +205,7 @@ function SearchComponent({}: Props) {
 
       {/* Search bar */}
       <div className="pt-6">
-        <div
-          className={`rounded-lg flex items-center w-full p-3 shadow-sm border ${inputBg}`}
-        >
+        <div className={`rounded-lg flex items-center w-full p-3 shadow-sm border ${inputBg}`}>
           <button className="outline-none focus:outline-none flex-shrink-0">
             <svg
               className="w-5 h-5 text-gray-500"
@@ -307,11 +300,7 @@ function SearchComponent({}: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Genre */}
                 <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${labelText}`}
-                  >
-                    Genre
-                  </label>
+                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Genre</label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
@@ -332,11 +321,7 @@ function SearchComponent({}: Props) {
 
                 {/* Year */}
                 <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${labelText}`}
-                  >
-                    Year
-                  </label>
+                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Year</label>
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(e.target.value)}
@@ -357,11 +342,7 @@ function SearchComponent({}: Props) {
 
                 {/* Sort by */}
                 <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${labelText}`}
-                  >
-                    Sort By
-                  </label>
+                  <label className={`block text-xs font-medium mb-1 ${labelText}`}>Sort By</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -418,9 +399,7 @@ function SearchComponent({}: Props) {
       {userSearchData.length < 1 ? (
         <div className="h-[300px] flex flex-col justify-center items-center gap-4">
           <FcSearch className="text-9xl animate-bounce" />
-          <p
-            className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}
-          >
+          <p className={`text-sm ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
             {option === "person"
               ? "Type a name to search people"
               : "Search or use filters to discover content"}
@@ -449,19 +428,13 @@ function SearchComponent({}: Props) {
                 />
                 <div className="absolute bottom-0 left-0 right-0 h-[160px] bg-gradient-to-t from-black to-transparent z-10" />
                 <div className="absolute bottom-2 left-2 z-20">
-                  <CircularRate
-                    value={data.vote_average || data.popularity / 10}
-                    isPoster={true}
-                  />
+                  <CircularRate value={data.vote_average || data.popularity / 10} isPoster={true} />
                   <p className="text-white text-xs font-medium truncate w-[140px] mt-1">
                     {data?.title || data?.name || data?.original_name}
                   </p>
                   {(data.release_date || data.first_air_date) && (
                     <p className="text-gray-400 text-xs">
-                      {(data.release_date || data.first_air_date)?.substring(
-                        0,
-                        4,
-                      )}
+                      {(data.release_date || data.first_air_date)?.substring(0, 4)}
                     </p>
                   )}
                 </div>

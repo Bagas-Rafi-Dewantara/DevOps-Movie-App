@@ -10,7 +10,7 @@ const PlaylistMovieSchema = new mongoose.Schema(
     vote_average: { type: Number },
     addedAt: { type: Date, default: Date.now },
   },
-  { _id: false },
+  { _id: false }
 );
 
 const PlaylistSchema = new mongoose.Schema(
@@ -20,7 +20,7 @@ const PlaylistSchema = new mongoose.Schema(
     description: { type: String, default: "" },
     movies: [PlaylistMovieSchema],
   },
-  { collection: "playlist-data", timestamps: true },
+  { collection: "playlist-data", timestamps: true }
 );
 
 PlaylistSchema.index({ userId: 1 });

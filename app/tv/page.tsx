@@ -51,11 +51,7 @@ function TvSession({}: Props) {
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-    >
+    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
       <ToastContainerBar />
       <Navbar />
       <GlobalLoading isLoading={isLoading} />
@@ -63,32 +59,17 @@ function TvSession({}: Props) {
         <main className="relative pl-4 pb-24 lg:space-y-24">
           <HomeBanner netflixOriginals={movie.topRated} />
           <section className="md:space-y-24 pt-20">
-            <Row
-              movies={movie.topRated.slice(0, 10)}
-              title="Trending Now"
-              isMain={true}
-            />
+            <Row movies={movie.topRated.slice(0, 10)} title="Trending Now" isMain={true} />
             <Row
               movies={movie.topRated.slice(10, movie.topRated.length)}
               title="Top Rated"
               isMain={true}
             />
             <div className="pb-14">
-              <Row
-                movies={movie.popularTv.slice(0, 10)}
-                title="Action Thrillers"
-                isMain={true}
-              />
+              <Row movies={movie.popularTv.slice(0, 10)} title="Action Thrillers" isMain={true} />
             </div>
-            <DividerMovieLine
-              netflixOriginals={movie.popularTv}
-              horrorMovies={movie.topRated}
-            />
-            <Row
-              movies={movie.onTheAirTv.slice(0, 10)}
-              title="Comedies"
-              isMain={true}
-            />
+            <DividerMovieLine netflixOriginals={movie.popularTv} horrorMovies={movie.topRated} />
+            <Row movies={movie.onTheAirTv.slice(0, 10)} title="Comedies" isMain={true} />
             <Row
               movies={movie.onTheAirTv.slice(10, movie.onTheAirTv.length)}
               title="Scary Movies"

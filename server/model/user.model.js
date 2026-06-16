@@ -11,7 +11,7 @@ const User = new mongoose.Schema(
     likePerson: [Number],
     time: { type: Date, default: Date.now },
   },
-  { collection: "user-data" },
+  { collection: "user-data" }
 );
 
 export default mongoose.model("UserData", User);

@@ -49,9 +49,7 @@ function SwiperSlidePage({ movies, baseUrl }: Props) {
             {movie.backdrop_path || movie.poster_path ? (
               <div>
                 <Image
-                  src={`${baseUrl}/${
-                    movie?.backdrop_path || movie?.poster_path
-                  }`}
+                  src={`${baseUrl}/${movie?.backdrop_path || movie?.poster_path}`}
                   alt={movie.name}
                   layout="fill"
                   className="rounded-md"

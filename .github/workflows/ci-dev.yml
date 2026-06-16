@@ -43,7 +43,6 @@ jobs:
       - name: Dependency Audit
         run: npm audit || true
 
-
   test:
     name: Unit Testing
     runs-on: ubuntu-latest
