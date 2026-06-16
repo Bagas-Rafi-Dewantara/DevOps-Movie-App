@@ -53,7 +53,7 @@ jobs:
           fi
           echo "✅ Frontend files validated"
 
-  # JOB 2: Build, Push & Deploy
+    # JOB 2: Build, Push & Deploy
   build-push-deploy:
     name: Build, Push & Deploy
     runs-on: ubuntu-latest
@@ -87,6 +87,28 @@ jobs:
           docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:${{ env.IMAGE_TAG }}
           docker push ${{ env.ACR_REGISTRY }}/${{ env.AZURE_WEBAPP_NAME }}:latest
           echo "✅ Image pushed to ACR successfully"
+
+      - name: Wait for Azure SCM to be ready
+        run: |
+          echo "⏳ Waiting 15 seconds for Azure SCM to stabilize..."
+          sleep 15
+
+      - name: Deploy to Azure Web App (Frontend) with Retry
+        run: |
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          RETRY_WAIT=10
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "🚀 Deployment attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
+
+            if [ $RETRY_COUNT -gt 0 ]; then
+              echo "⏳ Waiting $RETRY_WAIT seconds before retry..."
+              sleep $RETRY_WAIT
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+          done
 
       - name: Deploy to Azure Web App (Frontend)
         uses: azure/webapps-deploy@v3
