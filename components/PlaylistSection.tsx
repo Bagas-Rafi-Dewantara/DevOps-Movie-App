@@ -9,6 +9,7 @@ import { AiOutlineCheck, AiOutlineClose, AiFillStar } from "react-icons/ai";
 import {
   BsBookmarkPlus,
   BsCollectionPlay,
+  BsMusicNoteBeamed,
   BsPencil,
   BsPlus,
   BsTrash,
@@ -34,12 +35,59 @@ interface Playlist {
   createdAt: string;
 }
 
-// ── Playlist movie card ──────────────────────────────────────────────────────
-function PlaylistMovieCard({
+// ── Cover image: 1 poster or 2×2 collage ────────────────────────────────────
+function PlaylistCover({ movies }: { movies: PlaylistMovie[] }) {
+  const posters = movies
+    .filter((m) => m.poster_path)
+    .slice(0, 4)
+    .map((m) => `https://image.tmdb.org/t/p/w185${m.poster_path}`);
+
+  if (posters.length === 0) {
+    return (
+      <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+        <BsMusicNoteBeamed className="text-gray-500 text-4xl" />
+      </div>
+    );
+  }
+
+  if (posters.length < 4) {
+    return (
+      <Image
+        src={posters[0]}
+        alt="cover"
+        fill
+        className="object-cover"
+        sizes="160px"
+      />
+    );
+  }
+
+  // 2×2 collage
+  return (
+    <div className="w-full h-full grid grid-cols-2 grid-rows-2">
+      {posters.map((src, i) => (
+        <div key={i} className="relative overflow-hidden">
+          <Image
+            src={src}
+            alt={`cover-${i}`}
+            fill
+            className="object-cover"
+            sizes="80px"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Movie row item inside expanded playlist ──────────────────────────────────
+function MovieRowItem({
   movie,
+  index,
   onRemove,
 }: {
   movie: PlaylistMovie;
+  index: number;
   onRemove: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -55,51 +103,61 @@ function PlaylistMovieCard({
 
   return (
     <div
-      className="relative min-w-[120px] w-[120px] h-[180px] md:min-w-[140px] md:w-[140px] md:h-[210px] flex-shrink-0 rounded-md overflow-hidden cursor-pointer"
+      className={`flex items-center gap-3 px-4 py-2 rounded-md cursor-pointer transition-colors group ${
+        hovered ? "bg-white/10" : "bg-transparent"
+      }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={navigate}
     >
-      {movie.poster_path ? (
-        <Image
-          src={`https://image.tmdb.org/t/p/w342${movie.poster_path}`}
-          alt={movie.title || "Movie"}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 120px, 140px"
-        />
-      ) : (
-        <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-          <BsCollectionPlay className="text-gray-500 text-3xl" />
-        </div>
+      {/* Index or play icon */}
+      <span className="w-5 text-center text-sm text-gray-400 shrink-0 group-hover:hidden">
+        {index + 1}
+      </span>
+      <BsCollectionPlay className="w-5 text-white text-sm shrink-0 hidden group-hover:block" />
+
+      {/* Poster thumbnail */}
+      <div className="relative w-10 h-14 shrink-0 rounded overflow-hidden">
+        {movie.poster_path ? (
+          <Image
+            src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
+            alt={movie.title}
+            fill
+            className="object-cover"
+            sizes="40px"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+            <BsCollectionPlay className="text-gray-500 text-xs" />
+          </div>
+        )}
+      </div>
+
+      {/* Title */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium truncate">{movie.title}</p>
+        <p className="text-xs text-gray-400 capitalize">{movie.mediaType}</p>
+      </div>
+
+      {/* Rating */}
+      {movie.vote_average > 0 && (
+        <span className="text-xs text-gray-400 flex items-center gap-1 shrink-0">
+          <AiFillStar className="text-yellow-400" />
+          {movie.vote_average.toFixed(1)}
+        </span>
       )}
 
-      {hovered && (
-        <>
-          <div className="absolute inset-0 bg-black/60 z-10" />
-          <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
-            <p className="text-white text-xs font-medium line-clamp-2 leading-tight">
-              {movie.title}
-            </p>
-            {movie.vote_average > 0 && (
-              <p className="text-yellow-400 text-xs mt-0.5 flex items-center gap-0.5">
-                <AiFillStar className="text-xs" />
-                {movie.vote_average.toFixed(1)}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            title="Remove from playlist"
-            className="absolute top-1.5 right-1.5 z-30 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 transition-colors"
-          >
-            <AiOutlineClose className="text-xs" />
-          </button>
-        </>
-      )}
+      {/* Remove button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
+        className="text-gray-600 hover:text-red-500 transition-colors shrink-0 opacity-0 group-hover:opacity-100 p-1"
+        title="Remove from playlist"
+      >
+        <AiOutlineClose className="text-sm" />
+      </button>
     </div>
   );
 }
@@ -110,6 +168,7 @@ function PlaylistSection() {
   const { theme } = useTheme();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreateInput, setShowCreateInput] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -162,6 +221,7 @@ function PlaylistSection() {
       });
       toast.success(`"${name}" deleted`);
       setPlaylists((prev) => prev.filter((p) => p._id !== id));
+      if (selectedId === id) setSelectedId(null);
     } catch {
       toast.error("Failed to delete playlist");
     }
@@ -219,22 +279,23 @@ function PlaylistSection() {
 
   if (!session) return null;
 
-  // Theme classes
-  const cardBg =
-    theme === "dark"
-      ? "bg-gray-900"
-      : "bg-white border border-gray-200 shadow-sm";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
-  const inputBg =
-    theme === "dark"
-      ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
-      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400";
-  const dividerColor = theme === "dark" ? "border-gray-700" : "border-gray-200";
+  const isDark = theme === "dark";
+  const textSecondary = isDark ? "text-gray-400" : "text-gray-500";
+  const cardBg = isDark
+    ? "bg-gray-900"
+    : "bg-white border border-gray-200 shadow-sm";
+  const inputBg = isDark
+    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+    : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400";
+  const panelBg = isDark ? "bg-[#121212]" : "bg-gray-50 border border-gray-200";
+  const hoverCard = isDark ? "hover:bg-white/5" : "hover:bg-gray-100";
+
+  const selectedPlaylist = playlists.find((p) => p._id === selectedId) ?? null;
 
   return (
     <div className="px-4 pb-12">
       <Container header="My Playlists">
-        {/* Header row */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <p className={`text-sm ${textSecondary}`}>
             {isLoading
@@ -243,7 +304,7 @@ function PlaylistSection() {
           </p>
           <button
             onClick={() => setShowCreateInput(!showCreateInput)}
-            className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
           >
             <BsPlus className="text-lg" />
             New Playlist
@@ -267,13 +328,13 @@ function PlaylistSection() {
                   setNewPlaylistName("");
                 }
               }}
-              placeholder="Enter playlist name..."
+              placeholder="Nama playlist..."
               autoFocus
               className={`flex-1 bg-transparent border-b outline-none text-sm py-1 ${inputBg}`}
             />
             <button
               onClick={createPlaylist}
-              className="text-green-500 hover:text-green-400 p-1 transition-colors"
+              className="text-green-500 hover:text-green-400 p-1"
             >
               <AiOutlineCheck className="text-base" />
             </button>
@@ -282,7 +343,7 @@ function PlaylistSection() {
                 setShowCreateInput(false);
                 setNewPlaylistName("");
               }}
-              className="text-gray-400 hover:text-gray-300 p-1 transition-colors"
+              className="text-gray-400 hover:text-gray-300 p-1"
             >
               <AiOutlineClose className="text-base" />
             </button>
@@ -294,23 +355,39 @@ function PlaylistSection() {
           <div className={`text-center py-14 rounded-xl ${cardBg}`}>
             <BsCollectionPlay className="text-5xl text-gray-500 mx-auto mb-3" />
             <p className={`${textSecondary} text-sm`}>
-              No playlists yet. Create one to start saving movies!
+              Belum ada playlist. Buat satu untuk mulai menyimpan film!
             </p>
           </div>
         )}
 
-        {/* Playlist rows */}
-        <div className="space-y-10">
-          {playlists.map((playlist, index) => (
-            <div key={playlist._id}>
-              {index > 0 && (
-                <div className={`border-t ${dividerColor} mb-8 -mt-2`} />
-              )}
+        {/* ── Playlist cards (Spotify style) ── */}
+        {playlists.length > 0 && (
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+            {playlists.map((playlist) => {
+              const isSelected = selectedId === playlist._id;
+              return (
+                <div
+                  key={playlist._id}
+                  onClick={() =>
+                    setSelectedId(isSelected ? null : playlist._id)
+                  }
+                  className={`flex-shrink-0 w-40 rounded-lg p-3 cursor-pointer transition-all group ${hoverCard} ${
+                    isSelected
+                      ? isDark
+                        ? "bg-white/10 ring-2 ring-red-500"
+                        : "bg-gray-200 ring-2 ring-red-500"
+                      : isDark
+                        ? "bg-white/5"
+                        : "bg-gray-100"
+                  }`}
+                >
+                  {/* Cover */}
+                  <div className="relative w-full aspect-square rounded-md overflow-hidden mb-3 shadow-lg">
+                    <PlaylistCover movies={playlist.movies} />
+                  </div>
 
-              {/* Playlist header */}
-              <div className="flex items-center gap-3 mb-3 flex-wrap">
-                {editingId === playlist._id ? (
-                  <>
+                  {/* Name */}
+                  {editingId === playlist._id ? (
                     <input
                       type="text"
                       value={editingName}
@@ -319,79 +396,114 @@ function PlaylistSection() {
                         if (e.key === "Enter") renamePlaylist(playlist._id);
                         if (e.key === "Escape") setEditingId(null);
                       }}
+                      onClick={(e) => e.stopPropagation()}
                       autoFocus
-                      className={`text-base font-semibold border-b outline-none py-0.5 bg-transparent flex-1 min-w-0 ${inputBg}`}
+                      className={`w-full bg-transparent border-b outline-none text-sm font-semibold py-0.5 ${inputBg}`}
                     />
-                    <button
-                      onClick={() => renamePlaylist(playlist._id)}
-                      className="text-green-500 hover:text-green-400 transition-colors"
-                    >
-                      <AiOutlineCheck />
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="text-gray-400 hover:text-gray-300 transition-colors"
-                    >
-                      <AiOutlineClose />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <h3 className="text-base font-semibold uppercase tracking-wide">
+                  ) : (
+                    <p className="text-sm font-semibold truncate leading-tight">
                       {playlist.name}
-                    </h3>
-                    <span className={`text-xs ${textSecondary}`}>
-                      ({playlist.movies.length}{" "}
-                      {playlist.movies.length === 1 ? "movie" : "movies"})
-                    </span>
+                    </p>
+                  )}
+
+                  <p className={`text-xs mt-0.5 ${textSecondary}`}>
+                    {playlist.movies.length}{" "}
+                    {playlist.movies.length === 1 ? "film" : "film"}
+                  </p>
+
+                  {/* Action icons — show on hover */}
+                  <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setEditingId(playlist._id);
                         setEditingName(playlist.name);
                       }}
                       className={`${textSecondary} hover:text-white p-1 transition-colors`}
-                      title="Rename playlist"
+                      title="Rename"
                     >
                       <BsPencil className="text-xs" />
                     </button>
                     <button
-                      onClick={() =>
-                        deletePlaylist(playlist._id, playlist.name)
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deletePlaylist(playlist._id, playlist.name);
+                      }}
                       className="text-gray-500 hover:text-red-500 p-1 transition-colors"
-                      title="Delete playlist"
+                      title="Delete"
                     >
                       <BsTrash className="text-xs" />
                     </button>
-                  </>
-                )}
-              </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-              {/* Movie cards */}
-              {playlist.movies.length === 0 ? (
-                <p className={`text-sm ${textSecondary} pl-1 py-2`}>
-                  No movies yet. Go to any movie page and click{" "}
-                  <span className="font-medium text-white">
+        {/* ── Expanded playlist panel ── */}
+        {selectedPlaylist && (
+          <div className={`mt-5 rounded-xl p-5 ${panelBg}`}>
+            {/* Panel header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold">{selectedPlaylist.name}</h3>
+                <p className={`text-xs ${textSecondary}`}>
+                  {selectedPlaylist.movies.length}{" "}
+                  {selectedPlaylist.movies.length === 1 ? "film" : "film"}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedId(null)}
+                className={`${textSecondary} hover:text-white p-1.5 rounded-full transition-colors`}
+              >
+                <AiOutlineClose className="text-base" />
+              </button>
+            </div>
+
+            {/* Movie list */}
+            {selectedPlaylist.movies.length === 0 ? (
+              <div className="text-center py-8">
+                <BsCollectionPlay className="text-3xl text-gray-600 mx-auto mb-2" />
+                <p className={`text-sm ${textSecondary}`}>
+                  Belum ada film. Buka halaman film dan klik{" "}
+                  <span
+                    className={`font-medium ${isDark ? "text-white" : "text-gray-800"}`}
+                  >
                     Add to Playlist
                   </span>
                   .
                 </p>
-              ) : (
-                <div className="flex items-start gap-3 overflow-x-scroll scrollbar-hide pb-2">
-                  {playlist.movies.map((movie) => (
-                    <PlaylistMovieCard
-                      key={movie.movieId}
-                      movie={movie}
-                      onRemove={() =>
-                        removeMovieFromPlaylist(playlist._id, movie.movieId)
-                      }
-                    />
-                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col">
+                {/* Column headers */}
+                <div
+                  className={`flex items-center gap-3 px-4 pb-2 mb-1 border-b text-xs font-medium ${textSecondary} ${isDark ? "border-gray-800" : "border-gray-200"}`}
+                >
+                  <span className="w-5 text-center">#</span>
+                  <span className="w-10 shrink-0" />
+                  <span className="flex-1">Judul</span>
+                  <span className="w-12 text-right">Rating</span>
+                  <span className="w-8" />
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {selectedPlaylist.movies.map((movie, i) => (
+                  <MovieRowItem
+                    key={movie.movieId}
+                    movie={movie}
+                    index={i}
+                    onRemove={() =>
+                      removeMovieFromPlaylist(
+                        selectedPlaylist._id,
+                        movie.movieId,
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </Container>
     </div>
   );
