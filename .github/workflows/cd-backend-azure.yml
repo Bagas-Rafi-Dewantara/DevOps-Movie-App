@@ -130,7 +130,7 @@ jobs:
             RETRY_COUNT=$((RETRY_COUNT + 1))
             if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
               echo "⏳ Retrying in 30 seconds..."
-              sleep 30
+              sleep 120
             fi
           done
 
