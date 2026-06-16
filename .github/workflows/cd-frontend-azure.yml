@@ -216,7 +216,7 @@ jobs:
           echo "App Name: ${{ env.AZURE_WEBAPP_NAME }}"
           echo "Registry: ${{ env.ACR_REGISTRY }}"
           echo "Image Tag: ${{ env.IMAGE_TAG }}"
-          echo "URL: ${{ secrets.NEXTAUTH_URL }}"
+          echo "URL: https://pso-fp-movieapp12-ecbzfqf9d9bmf2dq.southeastasia-01.azurewebsites.net/"
           echo "Health Check: ${{ needs.health-check.result }}"
           echo "Deployment finished at: $(date)"
           echo "=========================================="
