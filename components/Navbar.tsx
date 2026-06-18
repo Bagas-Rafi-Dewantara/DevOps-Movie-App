@@ -98,6 +98,17 @@ function Navbar({}: Props) {
           {session && (
             <li
               className={`${navItemClass} ${
+                pathname === "/playlist" &&
+                "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
+              }`}
+              onClick={() => router.push("/playlist")}
+            >
+              Playlist
+            </li>
+          )}
+          {session && (
+            <li
+              className={`${navItemClass} ${
                 pathname === "/profile" &&
                 "bg-red-500 !text-white px-2.5 py-2.5 rounded-md"
               }`}
