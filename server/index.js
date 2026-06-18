@@ -6,21 +6,11 @@ import Pusher from "pusher";
 
 import { findMovies } from "./controllers/findMovie.js";
 import { findPerson } from "./controllers/findPerson.js";
-import { getReviews } from "./controllers/getReviews.js";
 import { getMovie } from "./controllers/getMovie.js";
 import { getPerson } from "./controllers/getPerson.js";
-import { getPlaylists } from "./controllers/getPlaylists.js";
 import { getUserData } from "./controllers/getUserData.js";
-import {
-  createPlaylist,
-  updatePlaylist,
-  deletePlaylist,
-  addMovieToPlaylist,
-  removeMovieFromPlaylist,
-} from "./controllers/managePlaylist.js";
 import { saveMovies } from "./controllers/saveMovie.js";
 import { SavePerson } from "./controllers/savePerson.js";
-import { saveReview } from "./controllers/saveReview.js";
 import { suggestionUser } from "./controllers/suggestionUser.js";
 import { getUser } from "./controllers/user.js";
 
@@ -66,13 +56,6 @@ mongoose.connection.once("open", () => {
       change: change,
     });
   });
-
-  const changeReview = mongoose.connection.collection("review-data").watch();
-  changeReview.on("change", (change) => {
-    pusher.trigger("review-data", "new-reviewData", {
-      change: change,
-    });
-  });
 });
 
 // HEALTH CHECK
@@ -92,18 +75,6 @@ app.route("/find/movie").get(findMovies).post(findMovies);
 app.get("/person/:id", getPerson);
 app.route("/save/person").get(SavePerson).post(SavePerson);
 app.route("/find/person").get(findPerson).post(findPerson);
-
-// REVIEW ROUTES
-app.get("/reviews/:movieId", getReviews);
-app.route("/save/review").get(saveReview).post(saveReview);
-
-// PLAYLIST ROUTES
-app.get("/playlists/user/:userId", getPlaylists);
-app.post("/playlist", createPlaylist);
-app.put("/playlist/:id", updatePlaylist);
-app.delete("/playlist/:id", deletePlaylist);
-app.post("/playlist/:id/movie", addMovieToPlaylist);
-app.delete("/playlist/:id/movie/:movieId", removeMovieFromPlaylist);
 
 // OTHER ROUTES
 app.get("/suggestion/:id", suggestionUser);
